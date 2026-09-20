@@ -1,0 +1,26 @@
+name: Documentation consistency
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /AGENTS.md
+            /FHAST/README.md
+            /FHAST/FHAST_App/README.md
+            /FHAST/developer_scripts/check_docs.py
+      - name: Check documentation
+        run: python3 FHAST/developer_scripts/check_docs.py

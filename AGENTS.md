@@ -12,18 +12,18 @@ All paths below are relative to the repository root.
 | Path | Current role |
 | --- | --- |
 | `FHAST/scripts/` | R model pipeline, spatial processing, analysis, and R Markdown reports. |
-| `FHAST/scripts/main/` | Initialization and setup/model/postprocessing orchestration; `run_all.R` is the simulation entry point. |
-| `FHAST/scripts/NetLogo/` | `FHAST.nlogo`, included `.nls` model procedures, and `NetLogo_Controller.R`. |
-| `FHAST/default_input/` | Bundled input configuration (`input_file.txt`). |
+| `FHAST/scripts/main/` | Initialization and setup/model/postprocessing orchestration; [run_all.R](FHAST/scripts/main/run_all.R) is the simulation entry point. |
+| `FHAST/scripts/NetLogo/` | [FHAST.nlogo](FHAST/scripts/NetLogo/FHAST.nlogo), included `.nls` model procedures, and [NetLogo_Controller.R](FHAST/scripts/NetLogo/NetLogo_Controller.R). |
+| `FHAST/default_input/` | Bundled input configuration ([input_file.txt](FHAST/default_input/input_file.txt)). |
 | `FHAST/developer_scripts/` | Developer batch-run and analysis scripts; inspect local assumptions before use. |
 | `FHAST/FHAST.Rproj` | R project within the FHAST application directory. |
-| `FHAST/FHAST_App/dist/script/` | R launch wrappers (`R/run_fhast.R`, `R/run_compare.R`, `R/run_ohwm.R`, `R/run_param.R`) and Windows Script Host deployment code. |
-| `FHAST/FHAST_App/app/` | Startup helper `app.R`, deployment settings `config.cfg`, dependency list `packages.txt`, and bundled R packages in `library/` (including `nlrx`). |
+| `FHAST/FHAST_App/dist/script/` | R launch wrappers ([run_fhast.R](FHAST/FHAST_App/dist/script/R/run_fhast.R), [run_compare.R](FHAST/FHAST_App/dist/script/R/run_compare.R), [run_ohwm.R](FHAST/FHAST_App/dist/script/R/run_ohwm.R), [run_param.R](FHAST/FHAST_App/dist/script/R/run_param.R)) and Windows Script Host deployment code. |
+| `FHAST/FHAST_App/app/` | Startup helper [app.R](FHAST/FHAST_App/app/app.R), deployment settings [config.cfg](FHAST/FHAST_App/app/config.cfg), dependency list [packages.txt](FHAST/FHAST_App/app/packages.txt), and bundled R packages in `library/` (including `nlrx`). |
 | `FHAST/FHAST_App/dist/R-Portable/App/R-Portable/` | Bundled R runtime and its standard library. |
 | `FHAST/FHAST_App/dist/NetLogo 6.2.2/` | Bundled NetLogo application and runtime; the number is part of the existing directory name. |
 | `FHAST/jdk-11/`, `FHAST/FHAST_App/dist/Pandoc/` | Bundled Java and report-rendering dependencies. |
 | `apps/`, `bin/`, `etc/`, `include/`, `lib/`, `share/` | OSGeo4W distribution; QGIS is under `apps/qgis-ltr/`, alongside Python, Qt, GRASS, and SAGA under `apps/`. |
-| `profile/profiles/default/` | Distributed QGIS profile, including settings in `QGIS/QGIS3.ini`. |
+| `profile/profiles/default/` | Distributed QGIS profile, including settings in [QGIS3.ini](profile/profiles/default/QGIS/QGIS3.ini). |
 | `profile/profiles/default/python/plugins/` | FHAST GUI source: simulation, file/template tools, comparison, OHWM, parameter fitting, and other plugins; also contains third-party/developer plugins. |
 | `OSGeo4W.bat`, `bin/o4w_env.bat`, `bin/qgis-ltr.bat`, `command.txt`, `customize.ini` | OSGeo4W/QGIS launch environment, command arguments, and UI customization. |
 | `FHAST/fhast.bat`, `FHAST/run_command.txt`, `FHAST/NetLogoConfig.txt` | Additional launch commands and NetLogo path/version configuration. |
@@ -86,11 +86,38 @@ outputs, or scientific behavior. Update this map when locations or architecture
 change. Check the user PDF, release notes, deployment notes, plugin help, and
 report templates as relevant; distinguish stale examples from executable behavior.
 
-Develop deterministic documentation-consistency checks where practical: referenced
-paths and scripts must exist, relative Markdown links must resolve, configuration
-keys must match their readers/writers, and documented dependency versions must
-match an identified authoritative source. No repository-wide documentation-check
-command was found; do not invent one. Avoid duplicating version numbers here.
+Run `python3 FHAST/developer_scripts/check_docs.py` from the repository root
+(Python 3.9+ standard library and Git) after documentation changes or changes to documented
+paths, scripts, or configuration-file locations, and before submitting those changes.
+[The checker](FHAST/developer_scripts/check_docs.py) also runs on pull requests and
+pushes to `main` via [GitHub Actions](.github/workflows/docs.yml).
+Run it in a Git worktree. CI sparsely materializes only the checker and allowlisted
+Markdown files. Missing targets pass only if the sparse checkout's Git index marks
+them (or tracked descendants for directories) as omitted with `skip-worktree`.
+Ordinary working-tree deletions and missing untracked targets still fail; present
+local files are checked normally. No target contents or network access are needed
+for index-based existence checks.
+
+Its explicit Markdown allowlist is `AGENTS.md`, `FHAST/README.md`, and
+`FHAST/FHAST_App/README.md`: contributor guidance, the project overview, and mixed
+project/historical deployment notes. It checks this map's backtick paths in the
+Path column and local inline/image-link destinations and reference definitions in
+those documents. Document current script/configuration-file references as relative
+links (as in this map), rather than relying on guesses about inline code. Use
+forward slashes and angle-wrapped or percent-encoded destinations for spaces or
+parentheses. Add new maintained Markdown files explicitly to the allowlist.
+
+It does not scan vendored trees, generated plugin help, PDF instructions, `README.R`,
+or R Markdown reports. Those remain subject to manual documentation review.
+Code examples, historical bare paths/commands, Windows drive/UNC links, external
+URLs, and fragment-only links are skipped. For file links with fragments or query
+strings, only the file path is checked. Anchor validity, reference-label matching,
+HTML links, and full Markdown syntax are outside this small checker's scope.
+It does not run scripts or prove semantic/scientific consistency, configuration-key
+validity, or version agreement. Add deterministic checks for those only when an
+authoritative source and reliable comparison are established.
+
+Avoid duplicating version numbers here.
 `NetLogoConfig.txt` supplies the controller's version/path; `packages.txt` lists
 R package names but is not a version lockfile. Consult bundled metadata for actual
 installed versions rather than treating generic README examples as authoritative.
@@ -106,9 +133,9 @@ installed versions rather than treating generic README examples as authoritative
   resource, and translation tests. These are not end-to-end scientific tests.
   Its `make test` uses nose and suppresses failures; inspect actual results,
   not just the exit status. Review environment and deployment paths before use.
-- Bundled dependencies also contain upstream tests. No FHAST-wide automated
-  scientific regression suite, CI pipeline, or documentation-consistency checker
-  was found. `FHAST/scripts/compare_runs/check_runs.R` checks compatibility of
+- Bundled dependencies also contain upstream tests. The documentation check above
+  has CI coverage; no FHAST-wide automated scientific regression suite was found.
+  `FHAST/scripts/compare_runs/check_runs.R` checks compatibility of
   user runs during comparison; it is not a standalone regression test suite.
 - Packaging work should establish and validate the complete Windows chain:
   QGIS -> FHAST plugin -> R -> nlrx -> NetLogo, including input preparation and
