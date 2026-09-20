@@ -71,8 +71,9 @@ class LaunchPathsTest(unittest.TestCase):
         previous = Path.cwd()
         try:
             os.chdir(self.temporary.name)
+            working_directory = Path.cwd()
             self.assertEqual(self.helper.launch_paths('run_fhast.R'), before)
-            self.assertEqual(Path.cwd(), Path(self.temporary.name).resolve())
+            self.assertEqual(Path.cwd(), working_directory)
         finally:
             os.chdir(previous)
 
