@@ -1,0 +1,117 @@
+# Working on FHAST
+
+FHAST (Fish Habitat Assessment and Simulation Tool) combines a QGIS Python
+plugin interface, R preprocessing and reporting, and a NetLogo simulation driven
+from R through `nlrx`. This repository contains a bundled Windows distribution,
+not just application source. Preserve that distribution during modernization.
+
+## Verified repository map
+
+All paths below are relative to the repository root.
+
+| Path | Current role |
+| --- | --- |
+| `FHAST/scripts/` | R model pipeline, spatial processing, analysis, and R Markdown reports. |
+| `FHAST/scripts/main/` | Initialization and setup/model/postprocessing orchestration; `run_all.R` is the simulation entry point. |
+| `FHAST/scripts/NetLogo/` | `FHAST.nlogo`, included `.nls` model procedures, and `NetLogo_Controller.R`. |
+| `FHAST/default_input/` | Bundled input configuration (`input_file.txt`). |
+| `FHAST/developer_scripts/` | Developer batch-run and analysis scripts; inspect local assumptions before use. |
+| `FHAST/FHAST.Rproj` | R project within the FHAST application directory. |
+| `FHAST/FHAST_App/dist/script/` | R launch wrappers (`R/run_fhast.R`, `R/run_compare.R`, `R/run_ohwm.R`, `R/run_param.R`) and Windows Script Host deployment code. |
+| `FHAST/FHAST_App/app/` | Startup helper `app.R`, deployment settings `config.cfg`, dependency list `packages.txt`, and bundled R packages in `library/` (including `nlrx`). |
+| `FHAST/FHAST_App/dist/R-Portable/App/R-Portable/` | Bundled R runtime and its standard library. |
+| `FHAST/FHAST_App/dist/NetLogo 6.2.2/` | Bundled NetLogo application and runtime; the number is part of the existing directory name. |
+| `FHAST/jdk-11/`, `FHAST/FHAST_App/dist/Pandoc/` | Bundled Java and report-rendering dependencies. |
+| `apps/`, `bin/`, `etc/`, `include/`, `lib/`, `share/` | OSGeo4W distribution; QGIS is under `apps/qgis-ltr/`, alongside Python, Qt, GRASS, and SAGA under `apps/`. |
+| `profile/profiles/default/` | Distributed QGIS profile, including settings in `QGIS/QGIS3.ini`. |
+| `profile/profiles/default/python/plugins/` | FHAST GUI source: simulation, file/template tools, comparison, OHWM, parameter fitting, and other plugins; also contains third-party/developer plugins. |
+| `OSGeo4W.bat`, `bin/o4w_env.bat`, `bin/qgis-ltr.bat`, `command.txt`, `customize.ini` | OSGeo4W/QGIS launch environment, command arguments, and UI customization. |
+| `FHAST/fhast.bat`, `FHAST/run_command.txt`, `FHAST/NetLogoConfig.txt` | Additional launch commands and NetLogo path/version configuration. |
+| `README.R`, `FHAST/README.md`, `FHAST/FHAST_App/README.md`, `FHAST Run Instructions 2.0.pdf` | Release notes, directory overview, deployment-framework notes, and user instructions. Plugin directories also contain README/help material. |
+
+## Current execution architecture
+
+`OSGeo4W.bat` initializes the bundled environment through `bin/o4w_env.bat`.
+`command.txt` supplies QGIS arguments selecting the customization file and bundled
+profile; `bin/qgis-ltr.bat` prepares Qt/Python/QGIS and starts the QGIS executable.
+
+The `run_fhast_simulation` plugin collects inputs and writes a run-specific
+`config.txt`. It opens a Windows command shell, navigates from its plugin location
+to `FHAST/`, and invokes bundled `Rscript.exe` with `run_fhast.R`, the configuration
+path, and a preview flag. Other analysis plugins use dedicated R wrappers.
+`fhast_loader` loads input files into QGIS; it is not the simulation launcher.
+
+`run_fhast.R` sets the private R library path, reads deployment configuration and
+package names, loads packages, sources `app.R` to locate Pandoc, then sources
+`scripts/main/run_all.R`. The latter performs setup and spatial/input processing,
+invokes `NetLogo_Controller.R`, and runs postprocessing/report generation. The
+controller reads `NetLogoConfig.txt`, configures `nlrx`, and runs `FHAST.nlogo`
+with a run-folder input. The model includes the neighboring `.nls` procedures.
+The argument-driven entry sets Java discovery to the bundled JDK.
+
+Do not infer a running Shiny frontend from deployment names or comments:
+`app.R` currently configures Pandoc. The deployment README contains generic and
+stale instructions; for example, `FHAST/run_command.txt` references a missing
+`dist/script/R/run.R`. Verify any documented command against its caller and files.
+
+## Change boundaries and runtime paths
+
+- Make small, reviewable, behavior-preserving changes. Preserve the current
+  working Windows distribution; avoid unrelated cleanup or dependency upgrades.
+- Keep infrastructure/packaging work separate from scientific/model changes.
+  Never incidentally change model logic, defaults, seeds or stochastic execution,
+  inputs, spatial/data transformations, units, output schemas, or report meaning.
+  Scientific changes require an explicit scope and appropriate result validation.
+- Develop reproducible installation/build/runtime mechanisms alongside the
+  bundled distribution. Remove vendored runtime trees only after replacements
+  are implemented and verified. Generic upstream deployment advice to stop
+  tracking bundled libraries is not a migration plan for this repository.
+- Avoid new machine-specific absolute paths. Prefer application-relative paths
+  and centralize runtime discovery when practical, preserving current behavior
+  while replacements are developed.
+- Treat working directory, profile layout, shell quoting, and path case as
+  compatibility contracts. Plugins traverse parent directories to find FHAST;
+  R uses `getwd()` and `here()`. Existing references vary in case (`FHAST_app`
+  versus `FHAST_App`, `netlogo` versus `NetLogo`) and rely on Windows behavior.
+  Do not assume this distribution runs unchanged on a case-sensitive system.
+- Inspect existing developer-specific absolute paths before running scripts.
+  Avoid committing incidental QGIS profile state, generated outputs, or runtime
+  changes produced during validation.
+
+## Documentation policy
+
+Inspect and update relevant documentation whenever a change affects installation,
+startup, paths, dependency versions, configuration, commands, workflows, inputs,
+outputs, or scientific behavior. Update this map when locations or architecture
+change. Check the user PDF, release notes, deployment notes, plugin help, and
+report templates as relevant; distinguish stale examples from executable behavior.
+
+Develop deterministic documentation-consistency checks where practical: referenced
+paths and scripts must exist, relative Markdown links must resolve, configuration
+keys must match their readers/writers, and documented dependency versions must
+match an identified authoritative source. No repository-wide documentation-check
+command was found; do not invent one. Avoid duplicating version numbers here.
+`NetLogoConfig.txt` supplies the controller's version/path; `packages.txt` lists
+R package names but is not a version lockfile. Consult bundled metadata for actual
+installed versions rather than treating generic README examples as authoritative.
+
+## Validation
+
+- Run existing relevant tests/checks when applicable and available. Report exact
+  checks and outcomes, prerequisites that prevented execution, and what remains
+  unverified. Never equate static inspection with a successful application run.
+- Several FHAST plugin directories contain Plugin Builder `test/` scaffolding,
+  Makefile test/lint targets, `pb_tool.cfg`, translation scripts, and Sphinx help
+  builds. For example, `run_fhast_simulation` has dialog, QGIS-environment,
+  resource, and translation tests. These are not end-to-end scientific tests.
+  Its `make test` uses nose and suppresses failures; inspect actual results,
+  not just the exit status. Review environment and deployment paths before use.
+- Bundled dependencies also contain upstream tests. No FHAST-wide automated
+  scientific regression suite, CI pipeline, or documentation-consistency checker
+  was found. `FHAST/scripts/compare_runs/check_runs.R` checks compatibility of
+  user runs during comparison; it is not a standalone regression test suite.
+- Packaging work should establish and validate the complete Windows chain:
+  QGIS -> FHAST plugin -> R -> nlrx -> NetLogo, including input preparation and
+  resulting outputs/reports. Compare against a recorded baseline with controlled
+  inputs and seeds before replacing bundled components. Until exercised, state
+  clearly that this chain remains unverified.
