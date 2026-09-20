@@ -25,6 +25,7 @@ All paths below are relative to the repository root.
 | `apps/`, `bin/`, `etc/`, `include/`, `lib/`, `share/` | OSGeo4W distribution; QGIS is under `apps/qgis-ltr/`, alongside Python, Qt, GRASS, and SAGA under `apps/`. |
 | `profile/profiles/default/` | Distributed QGIS profile, including settings in [QGIS3.ini](profile/profiles/default/QGIS/QGIS3.ini). |
 | `profile/profiles/default/python/plugins/` | FHAST GUI source: simulation, file/template tools, comparison, OHWM, parameter fitting, and other plugins; also contains third-party/developer plugins. |
+| `profile/profiles/default/python/plugins/fhast_paths.py` | Shared FHAST-root and relative R-launch paths for the four Python launcher plugins. |
 | `OSGeo4W.bat`, `bin/o4w_env.bat`, `bin/qgis-ltr.bat`, `command.txt`, `customize.ini` | OSGeo4W/QGIS launch environment, command arguments, and UI customization. |
 | `FHAST/fhast.bat`, `FHAST/run_command.txt`, `FHAST/NetLogoConfig.txt` | Additional launch commands and NetLogo path/version configuration. |
 | `README.R`, `FHAST/README.md`, `FHAST/FHAST_App/README.md`, `FHAST Run Instructions 2.0.pdf` | Release notes, directory overview, deployment-framework notes, and user instructions. Plugin directories also contain README/help material. |
@@ -36,10 +37,18 @@ All paths below are relative to the repository root.
 profile; `bin/qgis-ltr.bat` prepares Qt/Python/QGIS and starts the QGIS executable.
 
 The `run_fhast_simulation` plugin collects inputs and writes a run-specific
-`config.txt`. It opens a Windows command shell, navigates from its plugin location
+`config.txt`. It opens a Windows command shell, navigates from the shared helper's location
 to `FHAST/`, and invokes bundled `Rscript.exe` with `run_fhast.R`, the configuration
 path, and a preview flag. Other analysis plugins use dedicated R wrappers.
 `fhast_loader` loads input files into QGIS; it is not the simulation launcher.
+
+`run_fhast_simulation`, `compare_runs`, `ohwm_overlap`, and `parameter_fitter`
+import `launch_paths` from `fhast_paths.py` beside the plugin packages. QGIS already
+imports from this plugins directory; the helper needs no plugin activation or
+additional `sys.path` changes. It anchors the bundle root to its own file location
+and returns the FHAST working directory plus the existing relative Rscript/wrapper
+paths. Keep the helper with the distributed profile; copying an individual plugin
+alone does not provide it. Shell behavior and legacy batch/WSH paths remain unchanged.
 
 `run_fhast.R` sets the private R library path, reads deployment configuration and
 package names, loads packages, sources `app.R` to locate Pandoc, then sources
@@ -70,7 +79,7 @@ stale instructions; for example, `FHAST/run_command.txt` references a missing
   and centralize runtime discovery when practical, preserving current behavior
   while replacements are developed.
 - Treat working directory, profile layout, shell quoting, and path case as
-  compatibility contracts. Plugins traverse parent directories to find FHAST;
+  compatibility contracts. The shared helper derives FHAST from the profile layout;
   R uses `getwd()` and `here()`. Existing references vary in case (`FHAST_app`
   versus `FHAST_App`, `netlogo` versus `NetLogo`) and rely on Windows behavior.
   Do not assume this distribution runs unchanged on a case-sensitive system.
@@ -124,6 +133,12 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- Run `python3 FHAST/developer_scripts/test_fhast_paths.py` for launcher-path changes.
+  [Windows CI](.github/workflows/launcher-paths.yml) runs the same tests using
+  `python` on pull requests and pushes to `main`.
+  These standard-library tests use a temporary bundle with spaces and check command
+  construction without launching QGIS, R, or NetLogo; they do not validate Windows
+  shell execution or the end-to-end application.
 - Run existing relevant tests/checks when applicable and available. Report exact
   checks and outcomes, prerequisites that prevented execution, and what remains
   unverified. Never equate static inspection with a successful application run.

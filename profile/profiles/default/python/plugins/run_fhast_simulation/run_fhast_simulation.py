@@ -42,7 +42,7 @@ from .run_fhast_simulation_dialog import RunFHASTSimulationDialog
 
 import os.path
 import os
-import pathlib
+from fhast_paths import launch_paths
 import processing
 
 
@@ -231,8 +231,8 @@ class RunFHASTSimulation:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Get the path of this script
-            file_path = str(pathlib.Path(__file__).parent.resolve())
+            # Resolve paths in the bundled distribution; R still runs from FHAST/.
+            fhast_root, rscript, r_wrapper = launch_paths("run_fhast.R")
 
             #get the oputput path
             folder_path = self.dlg.output_folder.filePath()
@@ -461,10 +461,10 @@ class RunFHASTSimulation:
             quote_string = "\""
             cd_command = "cd "
             new_path_formated = new_path.replace("\\","/")
-            fhast_run = ".\FHAST_App\dist\R-Portable\App\R-Portable\\bin\Rscript.exe --vanilla \".\FHAST_app\dist\script\R\\run_fhast.R\" \"" + new_path_formated + "/config.txt" + "\""
+            fhast_run = rscript + " --vanilla \"" + r_wrapper + "\" \"" + new_path_formated + "/config.txt" + "\""
 
             # Run FHAST
-            os.system(start_command + quote_string + cd_command + file_path + "\..\..\..\..\..\..\FHAST & " + fhast_run + " " + str(preview_flag) + quote_string)
+            os.system(start_command + quote_string + cd_command + fhast_root + " & " + fhast_run + " " + str(preview_flag) + quote_string)
             
             pass
         

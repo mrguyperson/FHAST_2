@@ -1,0 +1,38 @@
+name: Windows launcher paths
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-launcher-paths:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Rscript.exe is LFS-tracked, but these tests only check is_file().
+          # Its pointer suffices; no executable contents are needed.
+          lfs: false
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /FHAST/developer_scripts/test_fhast_paths.py
+            /profile/profiles/default/python/plugins/fhast_paths.py
+            /profile/profiles/default/python/plugins/run_fhast_simulation/run_fhast_simulation.py
+            /profile/profiles/default/python/plugins/compare_runs/compare_runs.py
+            /profile/profiles/default/python/plugins/ohwm_overlap/ohwm_overlap.py
+            /profile/profiles/default/python/plugins/parameter_fitter/parameter_fitter.py
+            /FHAST/FHAST_App/dist/R-Portable/App/R-Portable/bin/Rscript.exe
+            /FHAST/FHAST_App/dist/script/R/run_fhast.R
+            /FHAST/FHAST_App/dist/script/R/run_compare.R
+            /FHAST/FHAST_App/dist/script/R/run_ohwm.R
+            /FHAST/FHAST_App/dist/script/R/run_param.R
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Test launcher paths
+        run: python FHAST/developer_scripts/test_fhast_paths.py
