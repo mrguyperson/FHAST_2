@@ -40,7 +40,7 @@ from .resources import *
 from .ohwm_overlap_dialog import OHWMOverlapDialog
 import os.path
 import processing
-import pathlib
+from fhast_paths import launch_paths
 
 
 from PyQt5.QtWidgets import QMenu
@@ -225,8 +225,8 @@ class OHWMOverlap:
         # See if OK was pressed
         if result:
 
-            # Get the path of this script
-            file_path = str(pathlib.Path(__file__).parent.resolve())
+            # Resolve paths in the bundled distribution; R still runs from FHAST/.
+            fhast_root, rscript, r_wrapper = launch_paths("run_ohwm.R")
 
             ##### Read in files ##############################################################
             # get the oputput path
@@ -343,9 +343,9 @@ class OHWMOverlap:
             new_path_f = folder_path.replace("\\","/")
             new_ohwm_f = ohwm_path.replace("\\","/")
             new_footprint_f = footprint_path.replace("\\","/")
-            fhast_run = ".\FHAST_App\dist\R-Portable\App\R-Portable\\bin\Rscript.exe --vanilla \".\FHAST_app\dist\script\R\\run_ohwm.R\" \"" + new_path_f + "\""
+            fhast_run = rscript + " --vanilla \"" + r_wrapper + "\" \"" + new_path_f + "\""
 
             # Run FHAST
-            os.system(start_command + quote_string + cd_command + file_path + "\..\..\..\..\..\..\FHAST & " + fhast_run + " " + new_ohwm_f + " " + new_footprint_f + quote_string)
+            os.system(start_command + quote_string + cd_command + fhast_root + " & " + fhast_run + " " + new_ohwm_f + " " + new_footprint_f + quote_string)
             
             pass       

@@ -35,7 +35,7 @@ from .resources import *
 # Import the code for the dialog
 from .compare_runs_dialog import CompareRunsDialog
 import os.path
-import pathlib
+from fhast_paths import launch_paths
 import processing
 import shutil
 
@@ -224,8 +224,8 @@ class CompareRuns:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Get the path of this script
-            file_path = str(pathlib.Path(__file__).parent.resolve())
+            # Resolve paths in the bundled distribution; R still runs from FHAST/.
+            fhast_root, rscript, r_wrapper = launch_paths("run_compare.R")
             
             # Get the three folder paths
             folder_path_1 = self.dlg.output_folder_1.filePath()
@@ -262,9 +262,9 @@ class CompareRuns:
             new_path_f = new_path.replace("\\","/")
             folder_1_f = folder_path_1.replace("\\","/")
             folder_2_f = folder_path_2.replace("\\","/")
-            fhast_run = ".\FHAST_App\dist\R-Portable\App\R-Portable\\bin\Rscript.exe --vanilla \".\FHAST_app\dist\script\R\\run_compare.R\" \"" + new_path_f + "\""
+            fhast_run = rscript + " --vanilla \"" + r_wrapper + "\" \"" + new_path_f + "\""
 
             # Run FHAST
-            os.system(start_command + quote_string + cd_command + file_path + "\..\..\..\..\..\..\FHAST & " + fhast_run + " " + folder_1_f + " " + folder_2_f + quote_string)
+            os.system(start_command + quote_string + cd_command + fhast_root + " & " + fhast_run + " " + folder_1_f + " " + folder_2_f + quote_string)
             
             pass
