@@ -25,24 +25,38 @@
     {
       "name": "qgis",
       "version": "3.16.11-1",
-      "status": "partial",
+      "status": "verified",
       "type": "osgeo4w-package",
       "evidence": [
         {
           "reference": "etc/setup/installed.db",
-          "detail": "Installed package names, exact revisions and cached archive names; not a dependency index or checksum list."
+          "detail": "Records installed package qgis-ltr 3.16.11-1 with archive packages-x86_64/qgis-ltr-3.16.11-1.tar.bz2."
         },
         {
-          "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini",
-          "detail": "Lists qgis-ltr 3.16.16-1 and 3.16.15-1, not the installed revision. Same-named v2 archives do not establish equivalence to this v1-era bundle."
+          "reference": "https://download.osgeo.org/osgeo4w/v1/md5sums",
+          "detail": "Official OSGeo4W v1 x86_64 historical artifact identity: qgis-ltr-3.16.11-1.tar.bz2, 52875655 bytes, MD5 1381bb3caea7e557c4d6fe31eb765e71. The investigation read the official archive in memory and confirmed this size and checksum. MD5 is historical artifact-identity evidence, not a modern authenticity guarantee."
+        },
+        {
+          "reference": "https://download.osgeo.org/osgeo4w/v2/md5sums",
+          "detail": "The identically named v2 x86_64 archive is distinct: 40103464 bytes, MD5 4c77d09b073f6b608f80f929fbf67f5f. It must not be substituted for the verified v1 artifact."
+        },
+        {
+          "reference": "etc/setup/qgis-ltr.lst.gz",
+          "detail": "All 1546 retained package paths and sizes match the v1 archive. All listing timestamps match when interpreted in Europe/Berlin with the applicable DST offset. Retained-file comparison found 1428 byte-for-byte matches, two matches to the SHA-256 identities and sizes represented by local Git LFS pointers, and 36 differences limited to CRLF-to-LF conversion. These comparisons strongly identify the v1 archive as the source package; LFS identities are not upstream release checksums."
+        },
+        {
+          "reference": "apps/qgis-ltr/resources/data/world_map.gpkg",
+          "detail": "This retained file has substantive local differences from the v1 archive while retaining the same total size. Together with text line-ending changes, this means the checked-in tree is not a pristine byte-for-byte extraction. Verified status applies only to acquisition of this individual upstream package, not equivalence of the customized installed tree or reconstruction of the complete OSGeo4W package set and dependency closure."
         }
       ],
       "package": "qgis-ltr",
       "filename": "qgis-ltr-3.16.11-1.tar.bz2",
-      "unresolved": [
-        "An authoritative matching historical v1 artifact URL and checksum remain unverified.",
-        "Reconstruction also requires the complete OSGeo4W package set."
-      ]
+      "url": "https://download.osgeo.org/osgeo4w/v1/x86_64/release/qgis/qgis-ltr/qgis-ltr-3.16.11-1.tar.bz2",
+      "checksum": {
+        "algorithm": "md5",
+        "value": "1381bb3caea7e557c4d6fe31eb765e71",
+        "reference": "https://download.osgeo.org/osgeo4w/v1/md5sums"
+      }
     },
     {
       "name": "qgis-python",
