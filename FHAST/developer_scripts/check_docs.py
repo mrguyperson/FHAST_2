@@ -14,9 +14,10 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCUMENTS = (
+    "README.md",                      # Repository landing page and roadmap.
     "AGENTS.md",                      # Current contributor guidance.
-    "FHAST/README.md",                # Project overview.
-    "FHAST/FHAST_App/README.md",       # Mixed project/historical deployment notes.
+    "FHAST/README.md",                # Project-directory overview.
+    "FHAST/FHAST_App/README.md",      # Mixed project/historical deployment notes.
 )
 MAP_HEADING = "## Verified repository map"
 # Simple inline/image links and reference definitions; spaces use <destination>.
