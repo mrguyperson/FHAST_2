@@ -1,0 +1,37 @@
+name: Windows runtime manifest
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-runtime-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Pandoc's pointer is sufficient: its version is explicitly unknown.
+          lfs: false
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /build/windows-runtime-manifest.json
+            /FHAST/developer_scripts/check_runtime_manifest.py
+            /FHAST/developer_scripts/test_runtime_manifest.py
+            /etc/setup/installed.db
+            /apps/qgis-ltr/bin/qgis.reg.tmpl
+            /apps/Python37/LICENSE.txt
+            /apps/Qt5/bin/qt.conf
+            /FHAST/FHAST_App/dist/R-Portable/App/R-Portable/library/base/DESCRIPTION
+            /FHAST/FHAST_App/dist/NetLogo 6.2.2/app/NetLogo.cfg
+            /FHAST/jdk-11/release
+            /FHAST/FHAST_App/dist/NetLogo 6.2.2/runtime/lib/rt.jar
+            /FHAST/FHAST_App/dist/Pandoc/pandoc.exe
+      - name: Test manifest checker
+        run: python3 FHAST/developer_scripts/test_runtime_manifest.py
+      - name: Verify current bundle metadata
+        run: python3 FHAST/developer_scripts/check_runtime_manifest.py

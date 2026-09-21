@@ -18,6 +18,7 @@ All paths below are relative to the repository root.
 | `FHAST/developer_scripts/` | Developer batch-run and analysis scripts; inspect local assumptions before use. |
 | `FHAST/FHAST.Rproj` | R project within the FHAST application directory. |
 | `FHAST/launcher_paths.R` | Shared base-R bootstrap paths used by the four R launch wrappers, relative to their FHAST working directory. |
+| `build/windows-runtime-manifest.json` | Versioned inventory of the current Windows runtime locations, versions, and evidence sources; not a launcher configuration. |
 | `FHAST/FHAST_App/dist/script/` | R launch wrappers ([run_fhast.R](FHAST/FHAST_App/dist/script/R/run_fhast.R), [run_compare.R](FHAST/FHAST_App/dist/script/R/run_compare.R), [run_ohwm.R](FHAST/FHAST_App/dist/script/R/run_ohwm.R), [run_param.R](FHAST/FHAST_App/dist/script/R/run_param.R)) and Windows Script Host deployment code. |
 | `FHAST/FHAST_App/app/` | Startup helper [app.R](FHAST/FHAST_App/app/app.R), deployment settings [config.cfg](FHAST/FHAST_App/app/config.cfg), dependency list [packages.txt](FHAST/FHAST_App/app/packages.txt), and bundled R packages in `library/` (including `nlrx`). |
 | `FHAST/FHAST_App/dist/R-Portable/App/R-Portable/` | Bundled R runtime and its standard library. |
@@ -153,6 +154,21 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- Run `python3 FHAST/developer_scripts/check_runtime_manifest.py` after runtime
+  version, location, or metadata changes, and update
+  [the manifest](build/windows-runtime-manifest.json) in the same change. It is the
+  maintained inventory for the current bundled Windows runtime, not a future
+  cross-platform packaging specification. Runtime metadata remains the evidence;
+  launchers do not consume the manifest. Package-manager versions include their
+  packaging revisions. Unknown versions are explicitly `null` with explanatory
+  notes; never promote directory names, guide dates, or examples to verified versions.
+  The checker validates schema, directory/source existence, and selected static
+  metadata fields. It does not establish binary integrity, dependency completeness,
+  license/redistribution rights, or successful runtime execution.
+  Run `python3 FHAST/developer_scripts/test_runtime_manifest.py` for checker changes.
+  [Manifest CI](.github/workflows/runtime-manifest.yml) runs both commands with a
+  sparse checkout and no LFS downloads. The NetLogo GUI JRE's version evidence is
+  inside `rt.jar`, so that specific archive is included; only its manifest is read.
 - Run `python3 FHAST/developer_scripts/test_fhast_paths.py` for launcher-path changes.
   [Windows CI](.github/workflows/launcher-paths.yml) runs the same tests using
   `python` on pull requests and pushes to `main`.

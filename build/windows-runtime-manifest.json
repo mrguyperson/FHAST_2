@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "platform": "windows",
+  "components": [
+    {
+      "name": "osgeo4w",
+      "version": null,
+      "path": ".",
+      "version_source": {"kind": "unknown", "path": "etc/setup/installed.db"},
+      "notes": "Package collection at the bundle root; no single distribution version is declared. Do not use the setup package version as the bundle version."
+    },
+    {
+      "name": "qgis",
+      "version": "3.16.11-1",
+      "path": "apps/qgis-ltr",
+      "version_source": {"kind": "osgeo4w-package", "path": "etc/setup/installed.db", "package": "qgis-ltr"},
+      "notes": "OSGeo4W package version, including packaging revision; not an executable version measurement."
+    },
+    {
+      "name": "qgis-python",
+      "version": "3.7.0-4",
+      "path": "apps/Python37",
+      "version_source": {"kind": "osgeo4w-package", "path": "etc/setup/installed.db", "package": "python3-core"},
+      "notes": "OSGeo4W package version including revision; bin/py3_env.bat selects this Python home."
+    },
+    {
+      "name": "qt",
+      "version": "5.11.2-1",
+      "path": "apps/Qt5",
+      "version_source": {"kind": "osgeo4w-package", "path": "etc/setup/installed.db", "package": "qt5-libs"},
+      "notes": "OSGeo4W package version including revision; bin/qt5_env.bat selects this Qt installation."
+    },
+    {
+      "name": "r",
+      "version": "4.2.0",
+      "path": "FHAST/FHAST_App/dist/R-Portable/App/R-Portable",
+      "version_source": {"kind": "text-field", "path": "FHAST/FHAST_App/dist/R-Portable/App/R-Portable/library/base/DESCRIPTION", "key": "Version", "separator": ":"},
+      "notes": "Explicit base-R package metadata; corroborated during inventory by include/Rversion.h and PortableApps AppInfo/appinfo.ini."
+    },
+    {
+      "name": "netlogo",
+      "version": "6.2.2",
+      "path": "FHAST/FHAST_App/dist/NetLogo 6.2.2",
+      "version_source": {"kind": "ini", "path": "FHAST/FHAST_App/dist/NetLogo 6.2.2/app/NetLogo.cfg", "section": "Application", "key": "app.version"},
+      "notes": "Explicit launcher metadata, not inferred from the directory name; corroborated during inventory by the NetLogo JAR manifest."
+    },
+    {
+      "name": "fhast-jdk",
+      "version": "11.0.20+9-LTS-256",
+      "path": "FHAST/jdk-11",
+      "version_source": {"kind": "text-field", "path": "FHAST/jdk-11/release", "key": "JAVA_RUNTIME_VERSION", "separator": "="},
+      "notes": "Full runtime build from Oracle JDK release metadata (JAVA_VERSION is 11.0.20). Selected by FHAST/scripts/main/run_all.R."
+    },
+    {
+      "name": "netlogo-jre",
+      "version": "1.8.0_275",
+      "path": "FHAST/FHAST_App/dist/NetLogo 6.2.2/runtime",
+      "version_source": {"kind": "jar-manifest", "path": "FHAST/FHAST_App/dist/NetLogo 6.2.2/runtime/lib/rt.jar", "key": "Implementation-Version"},
+      "notes": "BellSoft JRE shipped with the NetLogo GUI; rt.jar main-section metadata. Separate from FHAST's selected JDK. This is not the unrelated Created-By compiler version."
+    },
+    {
+      "name": "pandoc",
+      "version": null,
+      "path": "FHAST/FHAST_App/dist/Pandoc",
+      "version_source": {"kind": "unknown", "path": "FHAST/FHAST_App/dist/Pandoc/pandoc.exe"},
+      "notes": "Executable is an LFS pointer in Git. No reliable static installed-version declaration was found; guide dates and examples are not version evidence. Only path existence is checked."
+    }
+  ]
+}
