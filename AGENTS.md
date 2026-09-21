@@ -31,7 +31,7 @@ All paths below are relative to the repository root.
 | `profile/profiles/default/python/plugins/fhast_paths.py` | Shared FHAST-root and relative R-launch paths for the four Python launcher plugins. |
 | `OSGeo4W.bat`, `bin/o4w_env.bat`, `bin/qgis-ltr.bat`, `command.txt`, `customize.ini` | OSGeo4W/QGIS launch environment, command arguments, and UI customization. |
 | `FHAST/fhast.bat`, `FHAST/run_command.txt`, `FHAST/NetLogoConfig.txt` | Additional launch commands and NetLogo path/version configuration. |
-| `README.R`, `FHAST/README.md`, `FHAST/FHAST_App/README.md`, `FHAST Run Instructions 2.0.pdf` | Release notes, directory overview, deployment-framework notes, and user instructions. Plugin directories also contain README/help material. |
+| `README.md`, `README.R`, `FHAST/README.md`, `FHAST/FHAST_App/README.md`, `FHAST Run Instructions 2.0.pdf` | Repository overview and roadmap, release notes, directory overview, deployment-framework notes, and user instructions. Plugin directories also contain README/help material. |
 
 ## Current execution architecture
 
@@ -129,14 +129,15 @@ Ordinary working-tree deletions and missing untracked targets still fail; presen
 local files are checked normally. No target contents or network access are needed
 for index-based existence checks.
 
-Its explicit Markdown allowlist is `AGENTS.md`, `FHAST/README.md`, and
-`FHAST/FHAST_App/README.md`: contributor guidance, the project overview, and mixed
-project/historical deployment notes. It checks this map's backtick paths in the
-Path column and local inline/image-link destinations and reference definitions in
-those documents. Document current script/configuration-file references as relative
-links (as in this map), rather than relying on guesses about inline code. Use
-forward slashes and angle-wrapped or percent-encoded destinations for spaces or
-parentheses. Add new maintained Markdown files explicitly to the allowlist.
+Its explicit Markdown allowlist is `README.md`, `AGENTS.md`, `FHAST/README.md`, and
+`FHAST/FHAST_App/README.md`: the repository landing page, contributor guidance,
+the project-directory overview, and mixed project/historical deployment notes. It
+checks this map's backtick paths in the Path column and local inline/image-link
+destinations and reference definitions in those documents. Document current
+script/configuration-file references as relative links (as in this map), rather than
+relying on guesses about inline code. Use forward slashes and angle-wrapped or
+percent-encoded destinations for spaces or parentheses. Add new maintained Markdown
+files explicitly to the allowlist.
 
 It does not scan vendored trees, generated plugin help, PDF instructions, `README.R`,
 or R Markdown reports. Those remain subject to manual documentation review.
