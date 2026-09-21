@@ -226,7 +226,7 @@ implemented and validated.
 ### Runtime reconstruction
 
 - [ ] Resolve the complete historical OSGeo4W package and dependency set.
-- [ ] Verify the historical source and checksum for the bundled QGIS revision.
+- [x] Verify the historical OSGeo4W v1 source and checksum for the bundled QGIS package.
 - [ ] Verify the historical Windows NetLogo distribution used by FHAST.
 - [ ] Tie the recorded Oracle JDK download conclusively to the exact bundled JDK
       build.
