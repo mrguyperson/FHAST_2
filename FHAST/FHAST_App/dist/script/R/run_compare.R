@@ -1,14 +1,8 @@
 # allow arguments to be passed
 pass_arguments <- commandArgs(trailingOnly = TRUE)
 
-# capture the current working directory
-# set the package search path to the app specific library
-# and the local R-portable site library
-
-appwd = file.path(getwd(), 'FHAST_app')
-applibpath = file.path(appwd, 'app', 'library')
-# setwd(file.path(getwd(), 'FHAST'))
-scriptwd = file.path(getwd(), 'scripts')
+# Resolve the shared bootstrap paths before loading the private package library.
+source(file.path(getwd(), 'launcher_paths.R'), local = TRUE)
 
 # create app/library if it doesn't exist (e.g. first run)
 if (!dir.exists(applibpath)) {

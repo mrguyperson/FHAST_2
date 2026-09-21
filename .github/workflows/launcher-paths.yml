@@ -21,6 +21,8 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /FHAST/developer_scripts/test_fhast_paths.py
+            /FHAST/developer_scripts/test_r_launcher_paths.py
+            /FHAST/launcher_paths.R
             /profile/profiles/default/python/plugins/fhast_paths.py
             /profile/profiles/default/python/plugins/run_fhast_simulation/run_fhast_simulation.py
             /profile/profiles/default/python/plugins/compare_runs/compare_runs.py
@@ -36,3 +38,5 @@ jobs:
           python-version: '3.13'
       - name: Test launcher paths
         run: python FHAST/developer_scripts/test_fhast_paths.py
+      - name: Check R bootstrap paths without launching R
+        run: python FHAST/developer_scripts/test_r_launcher_paths.py
