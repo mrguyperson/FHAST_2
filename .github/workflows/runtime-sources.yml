@@ -22,8 +22,12 @@ jobs:
             /build/windows-runtime-sources.json
             /FHAST/developer_scripts/check_runtime_sources.py
             /FHAST/developer_scripts/test_runtime_sources.py
+            /FHAST/developer_scripts/fetch_runtime_artifacts.py
+            /FHAST/developer_scripts/test_fetch_runtime_artifacts.py
             /etc/setup/installed.db
       - name: Test acquisition metadata checker
         run: python3 FHAST/developer_scripts/test_runtime_sources.py
       - name: Check recorded acquisition metadata offline
         run: python3 FHAST/developer_scripts/check_runtime_sources.py
+      - name: Test artifact fetching with offline fixtures
+        run: python3 FHAST/developer_scripts/test_fetch_runtime_artifacts.py

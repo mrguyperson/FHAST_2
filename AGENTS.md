@@ -155,6 +155,24 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- The manual acquisition command is
+  `python3 FHAST/developer_scripts/fetch_runtime_artifacts.py --output-dir <directory>`.
+  Choose a directory outside this repository/runtime bundle. Optional
+  `--component <name>` selects one component; `--dry-run` validates and lists
+  eligible downloads without writing files or accessing the network.
+  [The fetcher](FHAST/developer_scripts/fetch_runtime_artifacts.py) downloads only
+  existing `verified` standalone artifact/package entries from source metadata.
+  Partial/unresolved entries and bundled children stay blocked; resolve their
+  evidence separately. Downloads are not installs, extraction, or packaging.
+  Existing files are checksum-verified and reused; mismatches fail without
+  overwriting them. Temporary downloads are verified before atomic publication
+  and cleaned up on failure. Publication requires filesystem hard-link support
+  (for example NTFS); unsupported filesystems fail without accepting an artifact.
+  Recorded checksums identify artifacts, not full FHAST bundle equivalence;
+  historical MD5 does not provide a modern authenticity guarantee.
+  Run `python3 FHAST/developer_scripts/test_fetch_runtime_artifacts.py` for fetcher
+  changes. Source CI also runs these tests with in-memory response fixtures and
+  no public network access or real runtime downloads.
 - Run `python3 FHAST/developer_scripts/check_runtime_sources.py` after acquisition
   metadata or runtime manifest changes, and
   `python3 FHAST/developer_scripts/test_runtime_sources.py` for checker changes.
