@@ -17,6 +17,7 @@ All paths below are relative to the repository root.
 | `FHAST/default_input/` | Bundled input configuration ([input_file.txt](FHAST/default_input/input_file.txt)). |
 | `FHAST/developer_scripts/` | Developer batch-run and analysis scripts; inspect local assumptions before use. |
 | `FHAST/FHAST.Rproj` | R project within the FHAST application directory. |
+| `FHAST/launcher_paths.R` | Shared base-R bootstrap paths used by the four R launch wrappers, relative to their FHAST working directory. |
 | `FHAST/FHAST_App/dist/script/` | R launch wrappers ([run_fhast.R](FHAST/FHAST_App/dist/script/R/run_fhast.R), [run_compare.R](FHAST/FHAST_App/dist/script/R/run_compare.R), [run_ohwm.R](FHAST/FHAST_App/dist/script/R/run_ohwm.R), [run_param.R](FHAST/FHAST_App/dist/script/R/run_param.R)) and Windows Script Host deployment code. |
 | `FHAST/FHAST_App/app/` | Startup helper [app.R](FHAST/FHAST_App/app/app.R), deployment settings [config.cfg](FHAST/FHAST_App/app/config.cfg), dependency list [packages.txt](FHAST/FHAST_App/app/packages.txt), and bundled R packages in `library/` (including `nlrx`). |
 | `FHAST/FHAST_App/dist/R-Portable/App/R-Portable/` | Bundled R runtime and its standard library. |
@@ -50,6 +51,12 @@ and returns the FHAST working directory plus the existing relative Rscript/wrapp
 paths. Keep the helper with the distributed profile; copying an individual plugin
 alone does not provide it. Shell behavior and legacy batch/WSH paths remain unchanged.
 
+The four R wrappers source `FHAST/launcher_paths.R` before package loading to set
+`appwd`, `applibpath`, and `scriptwd` in the caller's environment. This is the shared
+source for their deployment-directory, private-library, and script-directory paths.
+It uses only base R and retains `getwd()` as the anchor: the launchers must still
+start R in `FHAST/`. It neither changes directories nor selects an R executable.
+
 `run_fhast.R` sets the private R library path, reads deployment configuration and
 package names, loads packages, sources `app.R` to locate Pandoc, then sources
 `scripts/main/run_all.R`. The latter performs setup and spatial/input processing,
@@ -62,6 +69,19 @@ Do not infer a running Shiny frontend from deployment names or comments:
 `app.R` currently configures Pandoc. The deployment README contains generic and
 stale instructions; for example, `FHAST/run_command.txt` references a missing
 `dist/script/R/run.R`. Verify any documented command against its caller and files.
+
+Legacy launchers are retained, not repaired: `FHAST/fhast.bat` uses `Rscript.exe`
+from `PATH` and caller-relative script paths; no current application caller was
+found. `FHAST/run_command.txt` also has no verified reader. The WSH
+[run.wsf](FHAST/FHAST_App/dist/script/wsf/run.wsf) loads
+[run.js](FHAST/FHAST_App/dist/script/wsf/js/run.js), which reads `app/config.cfg`
+from its working directory, uses its parent as the launch base, and targets the
+same missing `run.R`. No current QGIS caller of this WSH route was found.
+`config.cfg`'s `r_exec.home` and WSH fallback apply only to that legacy route;
+they do not configure the active Python launchers. Deployment README and
+`FHAST/FHAST_App/dist/USAGE.md` examples describe that older framework.
+Pandoc discovery in `app.R`, Java discovery in `run_all.R`, and NetLogo discovery
+through `NetLogoConfig.txt` retain their existing independent contracts.
 
 ## Change boundaries and runtime paths
 
@@ -139,6 +159,9 @@ installed versions rather than treating generic README examples as authoritative
   These standard-library tests use a temporary bundle with spaces and check command
   construction without launching QGIS, R, or NetLogo; they do not validate Windows
   shell execution or the end-to-end application.
+- Run `python3 FHAST/developer_scripts/test_r_launcher_paths.py` for R bootstrap
+  path changes; the same Windows workflow runs it with `python`. These structural
+  and path-equivalence tests do not execute R or prove R startup succeeds.
 - Run existing relevant tests/checks when applicable and available. Report exact
   checks and outcomes, prerequisites that prevented execution, and what remains
   unverified. Never equate static inspection with a successful application run.
