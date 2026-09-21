@@ -18,6 +18,7 @@ jobs:
           persist-credentials: false
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /README.md
             /AGENTS.md
             /FHAST/README.md
             /FHAST/FHAST_App/README.md
