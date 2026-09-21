@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "name": "osgeo4w",
+      "version": null,
+      "status": "partial",
+      "type": "package-set",
+      "evidence": [
+        {
+          "reference": "etc/setup/installed.db",
+          "detail": "Installed package names, exact revisions and cached archive names; not a dependency index or checksum list."
+        },
+        {
+          "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini",
+          "detail": "Official surviving v1 index; it is not a snapshot of this installed package collection."
+        }
+      ],
+      "inventory": "etc/setup/installed.db",
+      "unresolved": [
+        "The 143 installed package records and per-package .lst.gz file lists do not retain the original mirror, dependency graph, or archive checksums.",
+        "The surviving index has newer QGIS revisions. A complete matching historical package set and dependency index have not been established; no dependency resolution is attempted."
+      ]
+    },
+    {
+      "name": "qgis",
+      "version": "3.16.11-1",
+      "status": "partial",
+      "type": "osgeo4w-package",
+      "evidence": [
+        {
+          "reference": "etc/setup/installed.db",
+          "detail": "Installed package names, exact revisions and cached archive names; not a dependency index or checksum list."
+        },
+        {
+          "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini",
+          "detail": "Lists qgis-ltr 3.16.16-1 and 3.16.15-1, not the installed revision. Same-named v2 archives do not establish equivalence to this v1-era bundle."
+        }
+      ],
+      "package": "qgis-ltr",
+      "filename": "qgis-ltr-3.16.11-1.tar.bz2",
+      "unresolved": [
+        "An authoritative matching historical v1 artifact URL and checksum remain unverified.",
+        "Reconstruction also requires the complete OSGeo4W package set."
+      ]
+    },
+    {
+      "name": "qgis-python",
+      "version": "3.7.0-4",
+      "status": "verified",
+      "type": "osgeo4w-package",
+      "evidence": [
+        {
+          "reference": "etc/setup/installed.db",
+          "detail": "Installed package names, exact revisions and cached archive names; not a dependency index or checksum list."
+        },
+        {
+          "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini",
+          "detail": "Exact version and install record: archive path and MD5. Verified individual package identity only, not the complete OSGeo4W dependency closure. MD5 is historical integrity metadata, not a modern authenticity guarantee."
+        }
+      ],
+      "package": "python3-core",
+      "filename": "python3-core-3.7.0-4.tar.bz2",
+      "url": "https://download.osgeo.org/osgeo4w/v1/x86_64/release/python3/python3-core/python3-core-3.7.0-4.tar.bz2",
+      "checksum": {
+        "algorithm": "md5",
+        "value": "8a265c274c2bbd8d36c2c1b67ffe2916",
+        "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini"
+      }
+    },
+    {
+      "name": "qt",
+      "version": "5.11.2-1",
+      "status": "verified",
+      "type": "osgeo4w-package",
+      "evidence": [
+        {
+          "reference": "etc/setup/installed.db",
+          "detail": "Installed package names, exact revisions and cached archive names; not a dependency index or checksum list."
+        },
+        {
+          "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini",
+          "detail": "Exact version and install record: archive path and MD5. Verified individual package identity only, not the complete OSGeo4W dependency closure. MD5 is historical integrity metadata, not a modern authenticity guarantee."
+        }
+      ],
+      "package": "qt5-libs",
+      "filename": "qt5-libs-5.11.2-1.tar.bz2",
+      "url": "https://download.osgeo.org/osgeo4w/v1/x86_64/release/qt5/qt5-libs/qt5-libs-5.11.2-1.tar.bz2",
+      "checksum": {
+        "algorithm": "md5",
+        "value": "f411de07b2debcfd74a77bcfc2f87775",
+        "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini"
+      }
+    },
+    {
+      "name": "r",
+      "version": "4.2.0",
+      "status": "verified",
+      "type": "artifact",
+      "evidence": [
+        {
+          "reference": "FHAST/FHAST_App/dist/R-Portable/App/AppInfo/appinfo.ini",
+          "detail": "R Portable DisplayVersion 4.2.0 and PackageVersion 4.2.0.0; the deployment README links this SourceForge project."
+        },
+        {
+          "reference": "https://sourceforge.net/projects/rportable/files/R-Portable/4.2.0/",
+          "detail": "Project archive lists the installer and its SHA-256 sidecar. This identifies the portable runtime distribution, not FHAST private R packages or local customizations."
+        }
+      ],
+      "filename": "R-Portable_4.2.0.paf.exe",
+      "url": "https://sourceforge.net/projects/rportable/files/R-Portable/4.2.0/R-Portable_4.2.0.paf.exe/download",
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "8dc0b45d1873e4e7e8fe9ba08fb97a07f834f997b043bcff340f5f547fec60bf",
+        "reference": "https://downloads.sourceforge.net/project/rportable/R-Portable/4.2.0/R-Portable_4.2.0.paf.exe.sha256"
+      }
+    },
+    {
+      "name": "netlogo",
+      "version": "6.2.2",
+      "status": "partial",
+      "type": "artifact",
+      "evidence": [
+        {
+          "reference": "FHAST/FHAST_App/dist/NetLogo 6.2.2/app/NetLogo.cfg",
+          "detail": "Explicit application version 6.2.2."
+        },
+        {
+          "reference": "https://api.github.com/repos/NetLogo/NetLogo/releases/tags/6.2.2",
+          "detail": "Official release has no binary assets; directs binary acquisition to the CCL download site."
+        }
+      ],
+      "unresolved": [
+        "Historical official CCL download page returned HTTP 403 during verification; Windows artifact filename, URL and checksum are not established.",
+        "Any FHAST modifications to the upstream distribution require a separate equivalence audit."
+      ]
+    },
+    {
+      "name": "fhast-jdk",
+      "version": "11.0.20+9-LTS-256",
+      "status": "partial",
+      "type": "artifact",
+      "evidence": [
+        {
+          "reference": "FHAST/jdk-11/release",
+          "detail": "Oracle commercial Windows x86_64 runtime 11.0.20+9-LTS-256."
+        },
+        {
+          "reference": "https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html",
+          "detail": "Official Windows ZIP filename and download URL from its data-file attribute."
+        },
+        {
+          "reference": "https://www.oracle.com/java/technologies/javase/11-0-20-relnotes.html",
+          "detail": "Confirms 11.0.20+9, but does not establish the full LTS-256 suffix of the bundled runtime."
+        }
+      ],
+      "filename": "jdk-11.0.20_windows-x64_bin.zip",
+      "url": "https://download.oracle.com/otn/java/jdk/11.0.20%2B9/78ca14fd6c8e40f8a74a1b7660c79db8/jdk-11.0.20_windows-x64_bin.zip",
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "b0c458fcdef5ef60585365966699514a23449ae0756dc16574f1c08e22dc37d7",
+        "reference": "https://www.oracle.com/a/tech/docs/11-0-20-checksum.html"
+      },
+      "unresolved": [
+        "The published archive has not been proven to contain the exact 11.0.20+9-LTS-256 runtime build; it is a candidate, not a verified substitute.",
+        "Oracle archive access/license prerequisites must be resolved before automated acquisition."
+      ]
+    },
+    {
+      "name": "netlogo-jre",
+      "version": "1.8.0_275",
+      "status": "partial",
+      "type": "bundled",
+      "evidence": [
+        {
+          "reference": "FHAST/FHAST_App/dist/NetLogo 6.2.2/runtime/lib/rt.jar",
+          "detail": "Main manifest identifies BellSoft runtime 1.8.0_275; not the unrelated Created-By compiler version."
+        },
+        {
+          "reference": "https://ccl.northwestern.edu/netlogo/6.2.2/docs/faq.html",
+          "detail": "NetLogo Windows distribution includes Java."
+        }
+      ],
+      "parent": "netlogo",
+      "unresolved": [
+        "Parent Windows distribution acquisition is incomplete; its inclusion of this exact JRE must be confirmed before reconstruction."
+      ]
+    },
+    {
+      "name": "pandoc",
+      "version": null,
+      "status": "unresolved",
+      "type": "unknown",
+      "evidence": [
+        {
+          "reference": "FHAST/FHAST_App/dist/Pandoc/pandoc.exe",
+          "detail": "Tracked as a Git LFS pointer; no verified installed version. LFS object IDs are not upstream release checksums."
+        }
+      ],
+      "unresolved": [
+        "Exact installed version and therefore matching upstream artifact are unknown. Guide dates, examples and contemporaneous releases cannot establish identity."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+name: Windows runtime acquisition metadata
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-runtime-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /build/windows-runtime-manifest.json
+            /build/windows-runtime-sources.json
+            /FHAST/developer_scripts/check_runtime_sources.py
+            /FHAST/developer_scripts/test_runtime_sources.py
+            /etc/setup/installed.db
+      - name: Test acquisition metadata checker
+        run: python3 FHAST/developer_scripts/test_runtime_sources.py
+      - name: Check recorded acquisition metadata offline
+        run: python3 FHAST/developer_scripts/check_runtime_sources.py

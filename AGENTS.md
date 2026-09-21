@@ -19,6 +19,7 @@ All paths below are relative to the repository root.
 | `FHAST/FHAST.Rproj` | R project within the FHAST application directory. |
 | `FHAST/launcher_paths.R` | Shared base-R bootstrap paths used by the four R launch wrappers, relative to their FHAST working directory. |
 | `build/windows-runtime-manifest.json` | Versioned inventory of the current Windows runtime locations, versions, and evidence sources; not a launcher configuration. |
+| `build/windows-runtime-sources.json` | Evidence-backed acquisition metadata and explicit historical gaps for those Windows runtimes; preparatory metadata, not a build script. |
 | `FHAST/FHAST_App/dist/script/` | R launch wrappers ([run_fhast.R](FHAST/FHAST_App/dist/script/R/run_fhast.R), [run_compare.R](FHAST/FHAST_App/dist/script/R/run_compare.R), [run_ohwm.R](FHAST/FHAST_App/dist/script/R/run_ohwm.R), [run_param.R](FHAST/FHAST_App/dist/script/R/run_param.R)) and Windows Script Host deployment code. |
 | `FHAST/FHAST_App/app/` | Startup helper [app.R](FHAST/FHAST_App/app/app.R), deployment settings [config.cfg](FHAST/FHAST_App/app/config.cfg), dependency list [packages.txt](FHAST/FHAST_App/app/packages.txt), and bundled R packages in `library/` (including `nlrx`). |
 | `FHAST/FHAST_App/dist/R-Portable/App/R-Portable/` | Bundled R runtime and its standard library. |
@@ -154,6 +155,24 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- Run `python3 FHAST/developer_scripts/check_runtime_sources.py` after acquisition
+  metadata or runtime manifest changes, and
+  `python3 FHAST/developer_scripts/test_runtime_sources.py` for checker changes.
+  [Source metadata](build/windows-runtime-sources.json) describes how current
+  Windows components could be acquired; the runtime manifest describes what is
+  installed. Keep component names and versions consistent. URLs and checksums
+  require recorded authoritative evidence; never substitute newer artifacts or
+  label LFS object IDs as upstream checksums. Incomplete historical acquisition
+  must remain `partial` or `unresolved` with explicit `unresolved` reasons.
+  `verified` identifies an individual source artifact, not equivalence of the
+  complete customized FHAST bundle. Historical MD5 values are not modern
+  authenticity guarantees. The checker documents schema 1 and validates structure,
+  manifest agreement, bundled relationships and installed OSGeo4W archive names.
+  [Source CI](.github/workflows/runtime-sources.yml) runs both commands offline on
+  PRs and pushes to `main`, with only JSON, checker/tests and `installed.db` checked
+  out; no runtime binaries or LFS downloads. Evidence truth, remote availability,
+  dependency closure and binary equivalence still require separate verification.
+  This is preparatory metadata, not a download/build script or cross-platform plan.
 - Run `python3 FHAST/developer_scripts/check_runtime_manifest.py` after runtime
   version, location, or metadata changes, and update
   [the manifest](build/windows-runtime-manifest.json) in the same change. It is the
