@@ -218,6 +218,8 @@ implemented and validated.
 - [x] Added explicit `verified`, `partial`, and `unresolved` acquisition states so
       missing historical evidence is not silently replaced with newer artifacts.
 - [x] Added offline CI validation of runtime acquisition metadata.
+- [x] Pinned and added offline validation for the exact 143-package OSGeo4W v1
+      acquisition set in `build/osgeo4w-v1-package-lock.json`.
 - [x] Added a checksum-verifying runtime artifact fetcher for components whose
       acquisition sources are already verified.
 - [x] Added offline tests covering runtime download selection, checksum validation,
@@ -275,12 +277,16 @@ deferred until the underlying application and runtime reconstruction are stable.
 
 ## Runtime reproducibility metadata
 
-Two files currently define the modernization boundary around the Windows runtime:
+Three files currently describe the Windows runtime inventory and acquisition inputs:
 
 - `build/windows-runtime-manifest.json` records what is present in the checked-in
   bundle and the static evidence for its version.
 - `build/windows-runtime-sources.json` records what is known about acquiring those
   same components again.
+- `build/osgeo4w-v1-package-lock.json` pins the exact recorded OSGeo4W v1 x86_64
+  package set, including artifact paths, sizes, and MD5 identities. It does not
+  reconstruct historical dependency resolution or prove installed-tree equivalence;
+  the artifact fetcher does not consume this lock yet.
 
 The acquisition metadata intentionally distinguishes verified artifacts from
 partial or unresolved historical evidence.

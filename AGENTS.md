@@ -20,6 +20,7 @@ All paths below are relative to the repository root.
 | `FHAST/launcher_paths.R` | Shared base-R bootstrap paths used by the four R launch wrappers, relative to their FHAST working directory. |
 | `build/windows-runtime-manifest.json` | Versioned inventory of the current Windows runtime locations, versions, and evidence sources; not a launcher configuration. |
 | `build/windows-runtime-sources.json` | Evidence-backed acquisition metadata and explicit historical gaps for those Windows runtimes; preparatory metadata, not a build script. |
+| `build/osgeo4w-v1-package-lock.json` | Exact recorded OSGeo4W v1 x86_64 acquisition set, in `installed.db` order, with authoritative artifact paths, sizes and MD5 identities. |
 | `FHAST/FHAST_App/dist/script/` | R launch wrappers ([run_fhast.R](FHAST/FHAST_App/dist/script/R/run_fhast.R), [run_compare.R](FHAST/FHAST_App/dist/script/R/run_compare.R), [run_ohwm.R](FHAST/FHAST_App/dist/script/R/run_ohwm.R), [run_param.R](FHAST/FHAST_App/dist/script/R/run_param.R)) and Windows Script Host deployment code. |
 | `FHAST/FHAST_App/app/` | Startup helper [app.R](FHAST/FHAST_App/app/app.R), deployment settings [config.cfg](FHAST/FHAST_App/app/config.cfg), dependency list [packages.txt](FHAST/FHAST_App/app/packages.txt), and bundled R packages in `library/` (including `nlrx`). |
 | `FHAST/FHAST_App/dist/R-Portable/App/R-Portable/` | Bundled R runtime and its standard library. |
@@ -156,6 +157,18 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- Run `python3 FHAST/developer_scripts/check_osgeo4w_package_lock.py` after changes
+  to the [package lock](build/osgeo4w-v1-package-lock.json), installed inventory, or
+  individually verified QGIS/Python/Qt sources. Run
+  `python3 FHAST/developer_scripts/test_osgeo4w_package_lock.py` for checker changes.
+  [Package-lock CI](.github/workflows/osgeo4w-package-lock.yml) runs both offline on
+  PRs and pushes to `main`, with five sparse inputs and no LFS downloads.
+  The lock pins exactly 143 recorded packages; source paths come from the official
+  v1 checksum inventory, not guessed package directories. It does not reconstruct
+  historical dependency resolution or prove availability, authenticity, dependency
+  closure, or customized installed-tree equivalence. Preserve unresolved resolver
+  discrepancies separately; never silently add dependencies to this recorded set.
+  The existing artifact fetcher does not consume the package lock yet.
 - The manual acquisition command is
   `python3 FHAST/developer_scripts/fetch_runtime_artifacts.py --output-dir <directory>`.
   Choose a directory outside this repository/runtime bundle. Optional

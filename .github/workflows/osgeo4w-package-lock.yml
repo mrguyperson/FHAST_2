@@ -1,0 +1,29 @@
+name: OSGeo4W v1 package lock
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-package-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /build/osgeo4w-v1-package-lock.json
+            /build/windows-runtime-sources.json
+            /etc/setup/installed.db
+            /FHAST/developer_scripts/check_osgeo4w_package_lock.py
+            /FHAST/developer_scripts/test_osgeo4w_package_lock.py
+      - name: Test package-lock checker offline
+        run: python3 FHAST/developer_scripts/test_osgeo4w_package_lock.py
+      - name: Validate recorded acquisition set offline
+        run: python3 FHAST/developer_scripts/check_osgeo4w_package_lock.py
