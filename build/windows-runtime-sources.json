@@ -14,12 +14,17 @@
         {
           "reference": "https://download.osgeo.org/osgeo4w/v1/x86_64/setup.ini",
           "detail": "Official surviving v1 index; it is not a snapshot of this installed package collection."
+        },
+        {
+          "reference": "build/osgeo4w-v1-package-lock.json",
+          "detail": "All 143 recorded installed packages have authoritative OSGeo4W v1 x86_64 artifact paths, published sizes and MD5 identities, matched from the official v1/md5sums inventory. This reproducibly specifies the exact recorded acquisition set, not the original dependency resolver or byte-for-byte equivalence of the customized installed tree."
         }
       ],
       "inventory": "etc/setup/installed.db",
       "unresolved": [
-        "The 143 installed package records and per-package .lst.gz file lists do not retain the original mirror, dependency graph, or archive checksums.",
-        "The surviving index has newer QGIS revisions. A complete matching historical package set and dependency index have not been established; no dependency resolution is attempted."
+        "The original historical dependency resolver/setup.ini state remains unresolved; the lock records installed.db membership without resolving dependencies.",
+        "Surviving dependency metadata references hdf5 -> jpeg and grass -> rbatch, which are absent from installed.db. These discrepancies remain unresolved; neither package is added to the acquisition set.",
+        "Equivalence between acquired artifacts and the customized installed tree remains unproven; the known QGIS local differences are retained."
       ]
     },
     {
