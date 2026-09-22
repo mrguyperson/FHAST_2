@@ -20,6 +20,8 @@ jobs:
           sparse-checkout: |
             /build/windows-runtime-manifest.json
             /build/windows-runtime-sources.json
+            /build/osgeo4w-v1-package-lock.json
+            /FHAST/developer_scripts/check_osgeo4w_package_lock.py
             /FHAST/developer_scripts/check_runtime_sources.py
             /FHAST/developer_scripts/test_runtime_sources.py
             /FHAST/developer_scripts/fetch_runtime_artifacts.py

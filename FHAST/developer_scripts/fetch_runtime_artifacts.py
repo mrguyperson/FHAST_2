@@ -1,15 +1,16 @@
-"""Download verified standalone artifacts only; never install or extract them."""
+"""Download verified standalone artifacts or an explicit validated package set."""
 import argparse
 import hashlib
 from http.client import HTTPException
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import sys
 import tempfile
 from urllib.request import HTTPRedirectHandler, build_opener
 
 sys.dont_write_bytecode = True
 from check_runtime_sources import ROOT, SOURCES, read_json, validate, web_url
+from check_osgeo4w_package_lock import LOCK, validate as validate_package_lock
 
 
 WINDOWS_DEVICES = {'CON', 'PRN', 'AUX', 'NUL', 'CONIN$', 'CONOUT$'} | {
@@ -33,7 +34,25 @@ def eligible(entry):
     return entry['status'] == 'verified' and entry['type'] in {'artifact', 'osgeo4w-package'}
 
 
-def select(root, component=None):
+def select(root, component=None, *, package_set=None):
+    if package_set is not None:
+        if component is not None:
+            raise ValueError('component and package_set are mutually exclusive')
+        if package_set != 'osgeo4w-v1':
+            raise ValueError('Unknown package set: ' + package_set)
+        errors = validate_package_lock(root)
+        if errors:
+            raise ValueError('Invalid OSGeo4W package lock: ' + '; '.join(errors))
+        selected = [dict(name=p['name'], filename=PurePosixPath(p['source_path']).name,
+                         url=p['url'], checksum=p['checksum'], size=p['size'])
+                    for p in read_json(root / LOCK)['packages']]
+    else:
+        selected = select_components(root, component)
+    check_filenames(selected)
+    return selected
+
+
+def select_components(root, component):
     errors = validate(root)
     if errors:
         raise ValueError('Invalid runtime source metadata: ' + '; '.join(errors))
@@ -46,7 +65,10 @@ def select(root, component=None):
         if not eligible(entry):
             reason = '; '.join(entry.get('unresolved', ['Not a standalone artifact/package.']))
             raise ValueError(f"{component}: status={entry['status']}, type={entry['type']}; cannot fetch: {reason}")
-    selected = [entry for entry in entries if eligible(entry)]
+    return [entry for entry in entries if eligible(entry)]
+
+
+def check_filenames(selected):
     names = set()
     for entry in selected:
         filename = entry['filename']
@@ -57,7 +79,6 @@ def select(root, component=None):
         if filename.casefold() in names:
             raise ValueError('Duplicate artifact filename: ' + filename)
         names.add(filename.casefold())
-    return selected
 
 
 def digest_file(path, algorithm):
@@ -69,6 +90,9 @@ def digest_file(path, algorithm):
 
 
 def verify(path, entry):
+    if 'size' in entry and path.stat().st_size != entry['size']:
+        raise ValueError(f"{entry['name']}: size mismatch for {path.name}: "
+                         f"expected {entry['size']}, got {path.stat().st_size}; file not accepted")
     checksum = entry['checksum']
     actual = digest_file(path, checksum['algorithm'])
     if actual.lower() != checksum['value'].lower():
@@ -76,8 +100,8 @@ def verify(path, entry):
                          f"expected {checksum['value']}, got {actual}; file not accepted")
 
 
-def fetch(output_dir, component=None, dry_run=False, *, root=ROOT, opener=open_download):
-    entries = select(root, component)
+def fetch(output_dir, component=None, dry_run=False, *, package_set=None, root=ROOT, opener=open_download):
+    entries = select(root, component, package_set=package_set)
     output_dir = Path(output_dir).resolve()
     # Acquisition output must stay separate from the checked-in bundle.
     if output_dir == root.resolve() or root.resolve() in output_dir.parents:
@@ -116,11 +140,14 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', required=True, type=Path,
                         help='artifact cache outside the repository (required)')
-    parser.add_argument('--component', help='one verified standalone component; default: all eligible')
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument('--component', help='one verified standalone component; default: all eligible')
+    selection.add_argument('--package-set', choices=['osgeo4w-v1'],
+                           help='explicitly fetch the validated 143-package OSGeo4W v1 lock')
     parser.add_argument('--dry-run', action='store_true', help='validate and show selection without writing or downloading')
     args = parser.parse_args(argv)
     try:
-        fetch(args.output_dir, args.component, args.dry_run)
+        fetch(args.output_dir, args.component, args.dry_run, package_set=args.package_set)
     except (OSError, ValueError, HTTPException) as exc:
         print('Runtime fetch failed: ' + str(exc), file=sys.stderr)
         return 1

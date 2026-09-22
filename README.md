@@ -224,6 +224,8 @@ implemented and validated.
       acquisition sources are already verified.
 - [x] Added offline tests covering runtime download selection, checksum validation,
       cache reuse, failed downloads, and safe artifact publication.
+- [x] Added explicit acquisition of the validated OSGeo4W v1 package lock with
+      `--package-set osgeo4w-v1`, including published-size verification.
 
 ### Runtime reconstruction
 
@@ -286,12 +288,14 @@ Three files currently describe the Windows runtime inventory and acquisition inp
 - `build/osgeo4w-v1-package-lock.json` pins the exact recorded OSGeo4W v1 x86_64
   package set, including artifact paths, sizes, and MD5 identities. It does not
   reconstruct historical dependency resolution or prove installed-tree equivalence;
-  the artifact fetcher does not consume this lock yet.
+  the artifact fetcher can acquire it explicitly with `--package-set osgeo4w-v1`.
 
 The acquisition metadata intentionally distinguishes verified artifacts from
 partial or unresolved historical evidence.
 
-The current artifact fetcher will download only entries already marked as verified.
+By default, the artifact fetcher downloads only individually verified standalone
+components. Explicit `--package-set osgeo4w-v1` selects the validated 143-package
+acquisition lock instead; it is mutually exclusive with `--component`.
 It does not install or extract them and does not substitute newer software for
 unresolved historical components.
 
