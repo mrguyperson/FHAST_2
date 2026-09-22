@@ -168,17 +168,24 @@ installed versions rather than treating generic README examples as authoritative
   historical dependency resolution or prove availability, authenticity, dependency
   closure, or customized installed-tree equivalence. Preserve unresolved resolver
   discrepancies separately; never silently add dependencies to this recorded set.
-  The existing artifact fetcher does not consume the package lock yet.
+  Fetch the validated lock explicitly with
+  `python3 FHAST/developer_scripts/fetch_runtime_artifacts.py --output-dir <directory> --package-set osgeo4w-v1`.
+  This selects exactly the 143 locked archives, stored flat in the output directory;
+  it does not install, extract, or reconstruct dependencies. Package-set fetching
+  does not change the partial status of the OSGeo4W source component.
 - The manual acquisition command is
   `python3 FHAST/developer_scripts/fetch_runtime_artifacts.py --output-dir <directory>`.
   Choose a directory outside this repository/runtime bundle. Optional
   `--component <name>` selects one component; `--dry-run` validates and lists
   eligible downloads without writing files or accessing the network.
   [The fetcher](FHAST/developer_scripts/fetch_runtime_artifacts.py) downloads only
-  existing `verified` standalone artifact/package entries from source metadata.
+  existing `verified` standalone artifact/package entries from source metadata by
+  default. `--package-set osgeo4w-v1` is explicit and mutually exclusive with
+  `--component`; it is never included in default selection.
   Partial/unresolved entries and bundled children stay blocked; resolve their
   evidence separately. Downloads are not installs, extraction, or packaging.
-  Existing files are checksum-verified and reused; mismatches fail without
+  Existing files are checksum-verified and reused; recorded package sizes are
+  checked before checksums for both downloads and cached files. Mismatches fail without
   overwriting them. Temporary downloads are verified before atomic publication
   and cleaned up on failure. Publication requires filesystem hard-link support
   (for example NTFS); unsupported filesystems fail without accepting an artifact.
