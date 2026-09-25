@@ -6,11 +6,14 @@ import os
 from pathlib import Path, PurePosixPath
 import sys
 import tempfile
-from urllib.request import HTTPRedirectHandler, build_opener
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 sys.dont_write_bytecode = True
 from check_runtime_sources import ROOT, SOURCES, read_json, validate, web_url
 from check_osgeo4w_package_lock import LOCK, validate as validate_package_lock
+
+
+USER_AGENT = 'FHAST-runtime-fetcher/1.0 (+https://github.com/mrguyperson/FHAST_2)'
 
 
 WINDOWS_DEVICES = {'CON', 'PRN', 'AUX', 'NUL', 'CONIN$', 'CONOUT$'} | {
@@ -27,7 +30,8 @@ class HTTPSRedirects(HTTPRedirectHandler):
 def open_download(url):
     """The only network boundary; fixtures can replace this callable in tests."""
     web_url(url)
-    return build_opener(HTTPSRedirects()).open(url, timeout=60)
+    request = Request(url, headers={'User-Agent': USER_AGENT})
+    return build_opener(HTTPSRedirects()).open(request, timeout=60)
 
 
 def eligible(entry):

@@ -184,6 +184,9 @@ installed versions rather than treating generic README examples as authoritative
   `--component`; it is never included in default selection.
   Partial/unresolved entries and bundled children stay blocked; resolve their
   evidence separately. Downloads are not installs, extraction, or packaging.
+  Downloads identify themselves as
+  `FHAST-runtime-fetcher/1.0 (+https://github.com/mrguyperson/FHAST_2)`; HTTPS URL
+  and redirect validation still applies.
   Existing files are checksum-verified and reused; recorded package sizes are
   checked before checksums for both downloads and cached files. Mismatches fail without
   overwriting them. Temporary downloads are verified before atomic publication
@@ -204,7 +207,11 @@ installed versions rather than treating generic README examples as authoritative
   label LFS object IDs as upstream checksums. Incomplete historical acquisition
   must remain `partial` or `unresolved` with explicit `unresolved` reasons.
   `verified` identifies an individual source artifact, not equivalence of the
-  complete customized FHAST bundle. Historical MD5 values are not modern
+  complete customized FHAST bundle. NetLogo acquisition identifies the official
+  Windows 64-bit MSI and its bundled JRE; FHAST retains a customized subset. Its
+  SHA-256 was calculated locally from official-server bytes, not published by
+  upstream; preserve that distinction in evidence and checksum references.
+  Historical MD5 values are not modern
   authenticity guarantees. The checker documents schema 1 and validates structure,
   manifest agreement, bundled relationships and installed OSGeo4W archive names.
   [Source CI](.github/workflows/runtime-sources.yml) runs both commands offline on

@@ -231,11 +231,11 @@ implemented and validated.
 
 - [ ] Resolve the complete historical OSGeo4W package and dependency set.
 - [x] Verify the historical OSGeo4W v1 source and checksum for the bundled QGIS package.
-- [ ] Verify the historical Windows NetLogo distribution used by FHAST.
+- [x] Identify and enable fetching of the official NetLogo 6.2.2 Windows 64-bit MSI.
+      FHAST retains a customized subset, not a pristine extraction.
 - [ ] Tie the recorded Oracle JDK download conclusively to the exact bundled JDK
       build.
-- [ ] Establish the relationship between the NetLogo distribution and its bundled
-      JRE.
+- [x] Establish bundled JRE provenance through the same verified NetLogo MSI.
 - [ ] Identify the exact bundled Pandoc version.
 - [ ] Add deterministic extraction of verified runtime artifacts.
 - [ ] Assemble the expected runtime directory layout from acquisition inputs.

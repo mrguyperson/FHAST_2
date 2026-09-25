@@ -137,7 +137,7 @@
     {
       "name": "netlogo",
       "version": "6.2.2",
-      "status": "partial",
+      "status": "verified",
       "type": "artifact",
       "evidence": [
         {
@@ -147,12 +147,27 @@
         {
           "reference": "https://api.github.com/repos/NetLogo/NetLogo/releases/tags/6.2.2",
           "detail": "Official release has no binary assets; directs binary acquisition to the CCL download site."
+        },
+        {
+          "reference": "https://www.netlogo.org/downloads/archive/6.2.2/",
+          "detail": "Official archive page identifies separate 32-bit and 64-bit Windows MSI downloads, including Java 8. The x86-64 MSI matches FHAST."
+        },
+        {
+          "reference": "https://downloads.netlogo.org/6.2.2/NetLogo-6.2.2-64.msi",
+          "detail": "Artifact size 217914933 bytes. SHA-256 was calculated locally from bytes retrieved from the official NetLogo server; it is NOT an upstream-published checksum. Comparison of 3493 MSI payload files with 406 tracked FHAST files found 388 byte-identical files, four launcher files matching local Git LFS SHA-256 identities and sizes, and four line-ending-only differences. The only substantively changed shared file is app/NetLogo.cfg (-Xmx1024m to -Xmx8192m). FHAST adds nine pathdir extension files and omits 1804 documentation, 1213 model and 79 video-extension files. This verifies acquisition provenance of a customized subset, not a pristine extraction or complete runtime reconstruction."
+        },
+        {
+          "reference": "README.R",
+          "detail": "Release notes record intentionally disabling the video extension, consistent with the payload comparison."
         }
       ],
-      "unresolved": [
-        "Historical official CCL download page returned HTTP 403 during verification; Windows artifact filename, URL and checksum are not established.",
-        "Any FHAST modifications to the upstream distribution require a separate equivalence audit."
-      ]
+      "filename": "NetLogo-6.2.2-64.msi",
+      "url": "https://downloads.netlogo.org/6.2.2/NetLogo-6.2.2-64.msi",
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "9ff23e9e470e449670f1bd177e1d3352bdc1c742c07eef0ebf7fe4cb4fcc53d0",
+        "reference": "https://downloads.netlogo.org/6.2.2/NetLogo-6.2.2-64.msi"
+      }
     },
     {
       "name": "fhast-jdk",
@@ -188,7 +203,7 @@
     {
       "name": "netlogo-jre",
       "version": "1.8.0_275",
-      "status": "partial",
+      "status": "verified",
       "type": "bundled",
       "evidence": [
         {
@@ -198,12 +213,13 @@
         {
           "reference": "https://ccl.northwestern.edu/netlogo/6.2.2/docs/faq.html",
           "detail": "NetLogo Windows distribution includes Java."
+        },
+        {
+          "reference": "https://downloads.netlogo.org/6.2.2/NetLogo-6.2.2-64.msi",
+          "detail": "The verified parent MSI contains BellSoft Java 1.8.0_275-b01 (build corroborated by static sun/misc/Version.class data). All 167 runtime files have counterparts: 164 match byte-for-byte and three differ only by line endings; no missing, added or substantively changed runtime files. Acquisition is through the parent MSI, not a standalone JRE artifact."
         }
       ],
-      "parent": "netlogo",
-      "unresolved": [
-        "Parent Windows distribution acquisition is incomplete; its inclusion of this exact JRE must be confirmed before reconstruction."
-      ]
+      "parent": "netlogo"
     },
     {
       "name": "pandoc",
