@@ -49,6 +49,35 @@ class FetchTest(unittest.TestCase):
         self.assertEqual({p.name for p in self.output.iterdir()}, {'one.zip', 'two.zip'})
         self.assertEqual((self.output / 'one.zip').read_bytes(), self.payload)
 
+    def test_network_boundary_user_agent(self):
+        url = self.entries[0]['url']
+        with patch.object(fetcher, 'build_opener') as build:
+            response = fetcher.open_download(url)
+            self.assertIs(response, build.return_value.open.return_value)
+            self.assertIsInstance(build.call_args.args[0], fetcher.HTTPSRedirects)
+            request = build.return_value.open.call_args.args[0]
+            self.assertEqual(request.full_url, url)
+            self.assertEqual(request.get_header('User-agent'),
+                'FHAST-runtime-fetcher/1.0 (+https://github.com/mrguyperson/FHAST_2)')
+            self.assertEqual(build.return_value.open.call_args.kwargs, {'timeout': 60})
+            with self.assertRaises(ValueError):
+                fetcher.open_download('http://example.org/artifact')
+            build.assert_called_once()
+
+    def test_repository_netlogo_selection_and_dry_run(self):
+        selected = fetcher.select(fetcher.ROOT, 'netlogo')
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]['filename'], 'NetLogo-6.2.2-64.msi')
+        names = {entry['name'] for entry in fetcher.select(fetcher.ROOT)}
+        self.assertIn('netlogo', names)
+        self.assertNotIn('netlogo-jre', names)
+        with self.assertRaisesRegex(ValueError, 'Not a standalone'):
+            fetcher.select(fetcher.ROOT, 'netlogo-jre')
+        with contextlib.redirect_stdout(io.StringIO()):
+            fetcher.fetch(self.output, 'netlogo', dry_run=True, opener=self.opener)
+        self.opener.assert_not_called()
+        self.assertFalse(self.output.exists())
+
     def test_selection(self):
         self.run_fetch(component='two')
         self.assertEqual(self.opener.call_count, 1)
