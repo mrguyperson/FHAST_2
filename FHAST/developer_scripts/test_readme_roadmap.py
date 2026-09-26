@@ -73,6 +73,7 @@ class RoadmapTest(unittest.TestCase):
         items, errors = roadmap.parse((self.root / 'README.md').read_text(encoding='utf-8'))
         self.assertFalse(errors)
         self.assertTrue(items)
+        self.assertTrue(items['runtime-pandoc-version'][0])
 
     def test_duplicate_id(self):
         self.replace('roadmap:docs-ci', 'roadmap:docs-consistency')
@@ -138,12 +139,28 @@ class RoadmapTest(unittest.TestCase):
                 self.assert_error(f'roadmap:{name} must be [x]')
                 self.mark(name, True)
 
-    def test_partial_and_unknown_must_be_unchecked(self):
-        for name in ('runtime-jdk-source', 'runtime-pandoc-version'):
-            with self.subTest(name=name):
-                self.mark(name, True)
-                self.assert_error(f'roadmap:{name} must be [ ]')
-                self.mark(name, False)
+    def test_partial_jdk_must_be_unchecked(self):
+        self.mark('runtime-jdk-source', True)
+        self.assert_error('roadmap:runtime-jdk-source must be [ ]')
+        self.mark('runtime-jdk-source', False)
+        self.assertEqual(self.errors(), [])
+
+    def test_unknown_pandoc_version_must_be_unchecked(self):
+        def manifest(data):
+            entry = next(e for e in data['components'] if e['name'] == 'pandoc')
+            entry.update(version=None, notes='Synthetic unidentified binary.',
+                         version_source=dict(kind='unknown', path=entry['version_source']['path']))
+        def sources(data):
+            entry = next(e for e in data['components'] if e['name'] == 'pandoc')
+            entry.update(version=None, status='unresolved', type='unknown',
+                         unresolved=['Synthetic unidentified binary.'])
+            for field in ('filename', 'url', 'checksum'):
+                entry.pop(field)
+        self.edit_json(roadmap.MANIFEST, manifest)
+        self.edit_json(roadmap.SOURCES, sources)
+        self.assert_error('roadmap:runtime-pandoc-version must be [ ]')
+        self.mark('runtime-pandoc-version', False)
+        self.assertEqual(self.errors(), [])
 
     def test_future_verified_jdk_changes_expected_state(self):
         def promote(data):
@@ -156,10 +173,13 @@ class RoadmapTest(unittest.TestCase):
         self.assertEqual(self.errors(), [])
 
     def test_known_pandoc_version_does_not_require_verified_acquisition(self):
-        def version(data):
-            next(e for e in data['components'] if e['name'] == 'pandoc')['version'] = '1.2.3'
-        self.edit_json(roadmap.MANIFEST, version)
-        self.edit_json(roadmap.SOURCES, version)
+        def partial(data):
+            entry = next(e for e in data['components'] if e['name'] == 'pandoc')
+            entry.update(status='partial', unresolved=['Synthetic acquisition gap.'])
+            entry.pop('checksum')
+        self.edit_json(roadmap.SOURCES, partial)
+        self.assertEqual(self.errors(), [])
+        self.mark('runtime-pandoc-version', False)
         self.assert_error('roadmap:runtime-pandoc-version must be [x]')
         self.mark('runtime-pandoc-version', True)
         self.assertEqual(self.errors(), [])

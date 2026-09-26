@@ -4,6 +4,7 @@ Run: python3 FHAST/developer_scripts/test_runtime_manifest.py
 """
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -80,6 +81,112 @@ class RuntimeManifestTest(unittest.TestCase):
         self.assert_error('version mismatch')
         self.component['version_source']['kind'] = 'filename'
         self.assert_error('unsupported version_source kind')
+
+    def binary_source(self, materialized=False, payload=b'synthetic binary\x00\xff'):
+        source = dict(kind='binary-sha256', path='metadata.txt',
+                      sha256=hashlib.sha256(payload).hexdigest(), size=len(payload),
+                      version='1.2.3')
+        self.component['version_source'] = source
+        pointer = ('version https://git-lfs.github.com/spec/v1\n'
+                   f"oid sha256:{source['sha256']}\nsize {source['size']}\n").encode('ascii')
+        (self.root / 'metadata.txt').write_bytes(payload if materialized else pointer)
+        return source, pointer
+
+    def test_binary_sha256_valid_lfs_pointer(self):
+        self.binary_source()
+        self.assertEqual(self.check(), [])
+
+    def test_binary_sha256_valid_materialized(self):
+        self.binary_source(materialized=True)
+        self.assertEqual(self.check(), [])
+
+    def test_binary_sha256_streams_multiple_chunks(self):
+        self.binary_source(materialized=True, payload=b'\x00\xff' * 600000)
+        self.assertEqual(self.check(), [])
+
+    def test_binary_sha256_wrong_lfs_sha(self):
+        source, pointer = self.binary_source()
+        (self.root / 'metadata.txt').write_bytes(
+            pointer.replace(source['sha256'].encode('ascii'), b'0' * 64))
+        self.assert_error('LFS pointer SHA-256 mismatch')
+
+    def test_binary_sha256_wrong_lfs_size(self):
+        source, pointer = self.binary_source()
+        (self.root / 'metadata.txt').write_bytes(pointer.replace(
+            f"size {source['size']}".encode('ascii'), b'size 999'))
+        self.assert_error('LFS pointer size mismatch')
+
+    def test_binary_sha256_malformed_pointer(self):
+        source, pointer = self.binary_source()
+        variants = [pointer.replace(b'spec/v1', b'spec/v2'),
+                    pointer.split(b'\n', 1)[1], pointer.rstrip(b'\n'),
+                    pointer.replace(b'\n', b'\r\n'), pointer + b'extra\n',
+                    pointer + b'x' * 2048, pointer.replace(b'oid ', b'oid  '),
+                    pointer.replace(source['sha256'].encode('ascii'), b'A' * 64),
+                    pointer.replace(f"size {source['size']}".encode('ascii'), b'size -1')]
+        for content in variants:
+            with self.subTest(content=content[:160]):
+                (self.root / 'metadata.txt').write_bytes(content)
+                self.assert_error('malformed LFS pointer')
+
+    def test_binary_sha256_unsupported_lfs_oid(self):
+        source, pointer = self.binary_source()
+        (self.root / 'metadata.txt').write_bytes(pointer.replace(b'oid sha256:', b'oid sha512:'))
+        self.assert_error('malformed LFS pointer')
+
+    def test_binary_sha256_wrong_materialized_sha(self):
+        self.binary_source(materialized=True)
+        path = self.root / 'metadata.txt'
+        path.write_bytes(path.read_bytes().replace(b'synthetic', b'Synthetic'))
+        self.assert_error('binary SHA-256 mismatch')
+
+    def test_binary_sha256_wrong_materialized_size(self):
+        self.binary_source(materialized=True)
+        path = self.root / 'metadata.txt'
+        path.write_bytes(path.read_bytes() + b'extra')
+        self.assert_error('binary size mismatch')
+
+    def test_binary_sha256_invalid_recorded_sha(self):
+        source, pointer = self.binary_source()
+        for value in ('A' * 64, 'g' * 64, 'a' * 63, 'a' * 65, 'a' * 64 + '\n', None, 123):
+            with self.subTest(value=value):
+                source['sha256'] = value
+                self.assert_error('sha256 must be 64 lowercase hexadecimal characters')
+
+    def test_binary_sha256_invalid_recorded_size(self):
+        source, pointer = self.binary_source()
+        for value in (0, -1, True, False, 1.0, '1', None):
+            with self.subTest(value=value):
+                source['size'] = value
+                self.assert_error('size must be a positive integer, not bool')
+
+    def test_binary_sha256_invalid_recorded_version(self):
+        source, pointer = self.binary_source()
+        for value in ('', ' ', ' 1.2.3', None, False, 123):
+            with self.subTest(value=value):
+                source['version'] = value
+                self.assert_error('version must be a nonempty string')
+
+    def test_binary_sha256_version_mismatch(self):
+        for materialized in (False, True):
+            with self.subTest(materialized=materialized):
+                self.binary_source(materialized=materialized)
+                self.component['version'] = '9.9'
+                self.assert_error("declared '9.9', metadata '1.2.3'")
+
+    def test_binary_sha256_missing_source(self):
+        self.binary_source()
+        (self.root / 'metadata.txt').unlink()
+        self.assert_error('missing version-source file')
+
+    def test_binary_sha256_missing_or_unsupported_fields(self):
+        source, pointer = self.binary_source()
+        for field in ('path', 'sha256', 'size', 'version'):
+            with self.subTest(field=field):
+                self.component['version_source'] = {k: v for k, v in source.items() if k != field}
+                self.assert_error('missing or unsupported version_source fields')
+        self.component['version_source'] = dict(source, unexpected='field')
+        self.assert_error('missing or unsupported version_source fields')
 
     def test_osgeo4w_package_revision(self):
         (self.root / 'metadata.txt').write_text(

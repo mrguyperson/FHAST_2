@@ -5,6 +5,7 @@ Standard library only; no runtime execution, tree hashing, Git, or network calls
 """
 
 import configparser
+import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -20,6 +21,7 @@ SOURCE_FIELDS = {
     'text-field': {'kind', 'path', 'key', 'separator'},
     'ini': {'kind', 'path', 'section', 'key'},
     'jar-manifest': {'kind', 'path', 'key'},
+    'binary-sha256': {'kind', 'path', 'sha256', 'size', 'version'},
 }
 
 
@@ -65,10 +67,39 @@ def field_value(text, key, separator):
     return values[0]
 
 
+def binary_version(path, source):
+    """Check an attested binary identity, without fetching LFS or executing it."""
+    with path.open('rb') as stream:
+        prefix = stream.read(1024)
+        if prefix.startswith((b'version', b'oid ', b'size ')):
+            pointer = re.fullmatch(
+                rb'version https://git-lfs.github.com/spec/v1\n'
+                rb'oid sha256:([0-9a-f]{64})\nsize (0|[1-9][0-9]*)\n', prefix)
+            require(pointer is not None and len(prefix) < 1024,
+                    'malformed LFS pointer: expected canonical v1 SHA-256 pointer')
+            sha256, size = pointer[1].decode('ascii'), int(pointer[2])
+            representation = 'LFS pointer'
+        else:
+            stream.seek(0)
+            digest, size = hashlib.sha256(), 0
+            for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+                digest.update(chunk)
+                size += len(chunk)
+            sha256 = digest.hexdigest()
+            representation = 'binary'
+    require(size == source['size'],
+            f"{representation} size mismatch: expected {source['size']}, got {size}")
+    require(sha256 == source['sha256'],
+            f"{representation} SHA-256 mismatch: expected {source['sha256']}, got {sha256}")
+    return source['version']
+
+
 def source_version(path, source):
     kind = source['kind']
     if kind == 'unknown':
         return None  # Existence only; an LFS pointer is sufficient here.
+    if kind == 'binary-sha256':
+        return binary_version(path, source)
     with path.open('rb') as stream:
         require(not stream.read(80).startswith(b'version https://git-lfs.github.com/spec/'),
                 'version metadata is an LFS pointer, not readable metadata: ' + str(path))
@@ -137,7 +168,15 @@ def validate(root, manifest_path=None):
             require(isinstance(source, dict) and isinstance(source.get('kind'), str)
                     and source['kind'] in SOURCE_FIELDS, 'unsupported version_source kind')
             require(set(source) == SOURCE_FIELDS[source['kind']], 'missing or unsupported version_source fields')
-            require(all(nonempty(value) for value in source.values()), 'version_source fields must be nonempty strings')
+            if source['kind'] == 'binary-sha256':
+                require(isinstance(source['sha256'], str)
+                        and re.fullmatch('[0-9a-f]{64}', source['sha256']),
+                        'binary-sha256 sha256 must be 64 lowercase hexadecimal characters')
+                require(type(source['size']) is int and source['size'] > 0,
+                        'binary-sha256 size must be a positive integer, not bool')
+                require(nonempty(source['version']), 'binary-sha256 version must be a nonempty string')
+            else:
+                require(all(nonempty(value) for value in source.values()), 'version_source fields must be nonempty strings')
             version = component['version']
             if source['kind'] == 'unknown':
                 require(version is None and nonempty(component.get('notes')),

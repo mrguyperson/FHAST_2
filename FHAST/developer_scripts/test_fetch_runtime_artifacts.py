@@ -78,6 +78,19 @@ class FetchTest(unittest.TestCase):
         self.opener.assert_not_called()
         self.assertFalse(self.output.exists())
 
+    def test_repository_pandoc_selection_and_dry_run(self):
+        selected = fetcher.select(fetcher.ROOT, 'pandoc')
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]['name'], 'pandoc')
+        self.assertEqual(selected[0]['filename'], 'pandoc-3.1-windows-x86_64.msi')
+        names = {entry['name'] for entry in fetcher.select(fetcher.ROOT)}
+        self.assertIn('pandoc', names)
+        with patch('socket.socket.connect', side_effect=AssertionError('network forbidden')), \
+                contextlib.redirect_stdout(io.StringIO()):
+            fetcher.fetch(self.output, 'pandoc', dry_run=True, opener=self.opener)
+        self.opener.assert_not_called()
+        self.assertFalse(self.output.exists())
+
     def test_selection(self):
         self.run_fetch(component='two')
         self.assertEqual(self.opener.call_count, 1)

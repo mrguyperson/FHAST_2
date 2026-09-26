@@ -14,7 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          # Pandoc's pointer is sufficient: its version is explicitly unknown.
+          # LFS stays disabled: Pandoc's canonical pointer verifies its fingerprint offline.
+          # The checker also verifies materialized bytes in a normal checkout.
           lfs: false
           persist-credentials: false
           sparse-checkout-cone-mode: false

@@ -60,10 +60,16 @@
     },
     {
       "name": "pandoc",
-      "version": null,
+      "version": "3.1",
       "path": "FHAST/FHAST_App/dist/Pandoc",
-      "version_source": {"kind": "unknown", "path": "FHAST/FHAST_App/dist/Pandoc/pandoc.exe"},
-      "notes": "Executable is an LFS pointer in Git. No reliable static installed-version declaration was found; guide dates and examples are not version evidence. Only path existence is checked."
+      "version_source": {
+        "kind": "binary-sha256",
+        "path": "FHAST/FHAST_App/dist/Pandoc/pandoc.exe",
+        "sha256": "4d36dc00bdb3a45c2d92699c45913d1c11902c4bdf0a987a0533476bcbc211aa",
+        "size": 129952256,
+        "version": "3.1"
+      },
+      "notes": "Binary fingerprint exactly matches the official Pandoc 3.1 Windows x86-64 executable. Validated against the canonical LFS pointer or materialized bytes; the LFS identity is not an upstream-published artifact checksum."
     }
   ]
 }
