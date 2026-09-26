@@ -23,5 +23,25 @@ jobs:
             /FHAST/README.md
             /FHAST/FHAST_App/README.md
             /FHAST/developer_scripts/check_docs.py
+            /FHAST/developer_scripts/check_readme_roadmap.py
+            /FHAST/developer_scripts/test_readme_roadmap.py
+            /build/windows-runtime-manifest.json
+            /build/windows-runtime-sources.json
+            /build/osgeo4w-v1-package-lock.json
+            /etc/setup/installed.db
+            /FHAST/developer_scripts/check_runtime_sources.py
+            /FHAST/developer_scripts/check_osgeo4w_package_lock.py
+            /FHAST/developer_scripts/fetch_runtime_artifacts.py
+            /FHAST/developer_scripts/check_runtime_manifest.py
+            /FHAST/developer_scripts/test_runtime_manifest.py
+            /FHAST/developer_scripts/test_runtime_sources.py
+            /FHAST/developer_scripts/test_osgeo4w_package_lock.py
+            /FHAST/developer_scripts/test_fetch_runtime_artifacts.py
+            /.github/workflows/runtime-sources.yml
+            /.github/workflows/osgeo4w-package-lock.yml
       - name: Check documentation
         run: python3 FHAST/developer_scripts/check_docs.py
+      - name: Check modernization roadmap
+        run: python3 FHAST/developer_scripts/check_readme_roadmap.py
+      - name: Test roadmap checks offline
+        run: python3 FHAST/developer_scripts/test_readme_roadmap.py

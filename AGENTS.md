@@ -123,8 +123,9 @@ Run `python3 FHAST/developer_scripts/check_docs.py` from the repository root
 paths, scripts, or configuration-file locations, and before submitting those changes.
 [The checker](FHAST/developer_scripts/check_docs.py) also runs on pull requests and
 pushes to `main` via [GitHub Actions](.github/workflows/docs.yml).
-Run it in a Git worktree. CI sparsely materializes only the checker and allowlisted
-Markdown files. Missing targets pass only if the sparse checkout's Git index marks
+Run it in a Git worktree. Docs CI sparsely materializes the allowlisted Markdown,
+checkers/tests, and small metadata/tooling inputs for the roadmap check below;
+no runtime binaries or LFS downloads. Missing targets pass only if the sparse checkout's Git index marks
 them (or tracked descendants for directories) as omitted with `skip-worktree`.
 Ordinary working-tree deletions and missing untracked targets still fail; present
 local files are checked normally. No target contents or network access are needed
@@ -149,6 +150,34 @@ HTML links, and full Markdown syntax are outside this small checker's scope.
 It does not run scripts or prove semantic/scientific consistency, configuration-key
 validity, or version agreement. Add deterministic checks for those only when an
 authoritative source and reliable comparison are established.
+
+`README.md` is the human-facing modernization roadmap. Topical headings classify
+work; checkbox state alone indicates completion. Preserve stable `roadmap:` IDs
+when rewording items; prose-only rewording normally needs no structural checker
+change. Give each new task a unique ID immediately above its checkbox. Adding,
+removing, moving or reordering tasks requires updating the checker's `ROADMAP`
+registration and its tests in the same PR. Any change that completes, invalidates, or materially changes an item's
+description or scope must update it in the same PR. Preparatory work alone does
+not justify checking a broader task.
+
+Run `python3 FHAST/developer_scripts/check_readme_roadmap.py` after changes to the
+roadmap or its implementation evidence, and
+`python3 FHAST/developer_scripts/test_readme_roadmap.py` for checker/rule changes.
+[The dedicated checker](FHAST/developer_scripts/check_readme_roadmap.py) and
+[its tests](FHAST/developer_scripts/test_readme_roadmap.py) run in docs CI. They
+require adjacent unique IDs and enforce every registered ID, its topical category,
+and heading/item order. Only explicit completion predicates constrain checkbox
+state; registered manual tasks retain human completion judgments. Source metadata and package-lock
+validation are reused offline; infrastructure rules check maintained file presence,
+and package-set selection checks the recorded lock without fetching. The manifest
+rule checks recorded metadata consistency; full runtime-content validation stays
+in manifest CI. Provenance tasks follow source status/parent relationships; Pandoc's
+version-identification task follows whether its recorded version is known.
+These checks cannot infer every semantic change or prove that existing tools work.
+Other roadmap judgments, including dependency resolution, runtime reconstruction,
+scientific equivalence, R reproducibility and platform support, remain manual.
+When a reliable deterministic completion predicate becomes available, add it to
+the checker and tests instead of relying only on contributor memory.
 
 Avoid duplicating version numbers here.
 `NetLogoConfig.txt` supplies the controller's version/path; `packages.txt` lists
