@@ -240,18 +240,38 @@
     },
     {
       "name": "pandoc",
-      "version": null,
-      "status": "unresolved",
-      "type": "unknown",
+      "version": "3.1",
+      "status": "verified",
+      "type": "artifact",
       "evidence": [
         {
+          "reference": "https://github.com/jgm/pandoc/releases/tag/3.1",
+          "detail": "Official Pandoc 3.1 release, published 2023-02-10, provides the Windows x86-64 MSI and ZIP."
+        },
+        {
+          "reference": "https://github.com/jgm/pandoc/releases/download/3.1/pandoc-3.1-windows-x86_64.msi",
+          "detail": "MSI size is 27488256 bytes. The recorded SHA-256 was calculated locally from official GitHub release bytes, NOT upstream-published. No published release checksum was found; GitHub asset metadata reported digest: null."
+        },
+        {
           "reference": "FHAST/FHAST_App/dist/Pandoc/pandoc.exe",
-          "detail": "Tracked as a Git LFS pointer; no verified installed version. LFS object IDs are not upstream release checksums."
+          "detail": "Both official Windows packages contain a 129952256-byte executable with SHA-256 4d36dc00bdb3a45c2d92699c45913d1c11902c4bdf0a987a0533476bcbc211aa, exactly matching the repository LFS OID and size. Static inspection identifies PE32+ x86-64 and pandoc-3.1-BSp343tFtzzCUerhKdXsd0; no executable was run. The LFS OID is a payload identity, not an upstream-published checksum."
+        },
+        {
+          "reference": "https://github.com/jgm/pandoc/blob/3.1/windows/pandoc.wxs",
+          "detail": "The MSI installs MANUAL.html as Pandoc User's Guide.html, matching FHAST. All four payload files correspond: the executable matches its LFS identity and three text files differ only by CRLF/LF normalization; no substantive differences or missing/additional payload files. The MSI is a verified acquisition source for this runtime payload."
+        },
+        {
+          "reference": "https://github.com/jgm/pandoc/releases/download/3.1/pandoc-3.1-windows-x86_64.zip",
+          "detail": "The official ZIP contains identical payload bytes, with the guide named MANUAL.html. The exact historical FHAST packaging choice remains unknown; payload equivalence does not prove FHAST originally used the MSI."
         }
       ],
-      "unresolved": [
-        "Exact installed version and therefore matching upstream artifact are unknown. Guide dates, examples and contemporaneous releases cannot establish identity."
-      ]
+      "filename": "pandoc-3.1-windows-x86_64.msi",
+      "url": "https://github.com/jgm/pandoc/releases/download/3.1/pandoc-3.1-windows-x86_64.msi",
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "225aa0389600f66d1ccd78b378a617a9a780cb3d1e41e875124ce94da5ac19ba",
+        "reference": "https://github.com/jgm/pandoc/releases/download/3.1/pandoc-3.1-windows-x86_64.msi"
+      }
     }
   ]
 }

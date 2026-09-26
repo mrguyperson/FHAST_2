@@ -256,9 +256,12 @@ installed versions rather than treating generic README examples as authoritative
   launchers do not consume the manifest. Package-manager versions include their
   packaging revisions. Unknown versions are explicitly `null` with explanatory
   notes; never promote directory names, guide dates, or examples to verified versions.
-  The checker validates schema, directory/source existence, and selected static
-  metadata fields. It does not establish binary integrity, dependency completeness,
-  license/redistribution rights, or successful runtime execution.
+  The checker validates schema, directory/source existence, selected static
+  metadata fields, and recorded `binary-sha256` identities using canonical LFS
+  pointers or streamed materialized bytes. Pointer checks establish the recorded
+  object identity, not availability of its contents. These checks do not establish
+  whole-runtime integrity, dependency completeness, license/redistribution rights,
+  or successful runtime execution.
   Run `python3 FHAST/developer_scripts/test_runtime_manifest.py` for checker changes.
   [Manifest CI](.github/workflows/runtime-manifest.yml) runs both commands with a
   sparse checkout and no LFS downloads. The NetLogo GUI JRE's version evidence is

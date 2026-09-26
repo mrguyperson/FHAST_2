@@ -248,7 +248,7 @@ completion, and completed work stays in its topical category.
 <!-- roadmap:runtime-netlogo-jre-source -->
 - [x] Establish bundled JRE provenance through the same verified NetLogo MSI.
 <!-- roadmap:runtime-pandoc-version -->
-- [ ] Identify the exact bundled Pandoc version.
+- [x] Identify the exact bundled Pandoc version.
 
 ### Runtime acquisition and reconstruction
 
