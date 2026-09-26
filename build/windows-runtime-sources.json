@@ -177,7 +177,19 @@
       "evidence": [
         {
           "reference": "FHAST/jdk-11/release",
-          "detail": "Oracle commercial Windows x86_64 runtime 11.0.20+9-LTS-256."
+          "detail": "Explicit Oracle commercial Windows x86_64 runtime 11.0.20+9-LTS-256, dated 2023-07-18; corroborated independently by bundled JVM and module metadata."
+        },
+        {
+          "reference": "FHAST/jdk-11/bin/server/jvm.dll",
+          "detail": "Windows x86-64 PE version resources identify Oracle Java HotSpot(TM) 64-Bit Server VM, full version 11.0.20+9-LTS-256."
+        },
+        {
+          "reference": "FHAST/jdk-11/jmods/java.base.jmod",
+          "detail": "classes/java/lang/VersionProps.class contains the same complete runtime version 11.0.20+9-LTS-256."
+        },
+        {
+          "reference": "FHAST/jdk-11/lib/src.zip",
+          "detail": "java.base/java/lang/VersionProps.java records VERSION_NUMBER=11.0.20, VERSION_BUILD=9 and VERSION_OPT=LTS-256. These local sources establish bundled identity, not candidate ZIP equivalence. Local file hashes and Git LFS object IDs are not Oracle-published checksums."
         },
         {
           "reference": "https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html",
@@ -186,6 +198,10 @@
         {
           "reference": "https://www.oracle.com/java/technologies/javase/11-0-20-relnotes.html",
           "detail": "Confirms 11.0.20+9, but does not establish the full LTS-256 suffix of the bundled runtime."
+        },
+        {
+          "reference": "https://www.oracle.com/java/technologies/downloads/archive/",
+          "detail": "Oracle states archive downloads require an Oracle account. During investigation, cookie-free requests with both default urllib and the FHAST User-Agent received HTTP 302 redirects from download.oracle.com through edelivery.oracle.com to login-ext.identity.oraclecloud.com/oauth2/v1/authorize. Investigation stopped before authentication; no credentials, license cookies, tokens or session state were supplied. The download page links the Oracle Technology Network License Agreement for Oracle Java SE."
         }
       ],
       "filename": "jdk-11.0.20_windows-x64_bin.zip",
@@ -196,8 +212,9 @@
         "reference": "https://www.oracle.com/a/tech/docs/11-0-20-checksum.html"
       },
       "unresolved": [
-        "The published archive has not been proven to contain the exact 11.0.20+9-LTS-256 runtime build; it is a candidate, not a verified substitute.",
-        "Oracle archive access/license prerequisites must be resolved before automated acquisition."
+        "The candidate ZIP was not downloaded: it has not been obtained through the official Oracle download flow and compared with FHAST/jdk-11/, so equivalence to the bundled 11.0.20+9-LTS-256 runtime remains unproven. The published archive checksum has not been independently verified against downloaded bytes.",
+        "Public Oracle release metadata identifies 11.0.20+9 but has not been shown to tie the candidate ZIP to the complete LTS-256 build identity; the specific meaning of 256 remains unestablished.",
+        "The official archive download currently requires Oracle authentication and the license flow, so unauthenticated automated acquisition through the existing fetcher is unavailable. This access restriction does not establish a provenance mismatch."
       ]
     },
     {
