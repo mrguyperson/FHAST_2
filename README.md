@@ -196,81 +196,131 @@ The current goals are to:
 
 Modernization is being performed through small, reviewable changes. The current
 working Windows bundle remains in place until replacement mechanisms have been
-implemented and validated.
+implemented and validated. Headings group work by subject; checkboxes indicate
+completion, and completed work stays in its topical category.
 
-### Implemented
+### Documentation and maintenance
 
+<!-- roadmap:repository-guidance -->
 - [x] Documented the repository architecture, execution chain, and modernization
       constraints in `AGENTS.md`.
+<!-- roadmap:docs-consistency -->
 - [x] Added an offline documentation-consistency checker.
+<!-- roadmap:docs-ci -->
 - [x] Added GitHub Actions validation for maintained documentation.
+
+### Launchers and path handling
+
+<!-- roadmap:launcher-paths -->
 - [x] Centralized FHAST-root and bundled-R path discovery for the active QGIS
       simulation and analysis launchers.
+<!-- roadmap:launcher-path-tests -->
 - [x] Added focused Windows launcher-path tests.
+<!-- roadmap:r-bootstrap-paths -->
 - [x] Centralized shared bootstrap paths used by the active R launch wrappers.
+<!-- roadmap:r-bootstrap-tests -->
 - [x] Added structural and path-equivalence tests for the R launch wrappers.
+
+### Runtime inventory and provenance
+
+<!-- roadmap:runtime-manifest -->
 - [x] Added `build/windows-runtime-manifest.json`, a machine-readable inventory of
       the checked-in Windows runtime components.
+<!-- roadmap:runtime-manifest-validation -->
 - [x] Added deterministic validation of runtime versions and locations against
       static repository metadata.
+<!-- roadmap:runtime-sources -->
 - [x] Added `build/windows-runtime-sources.json`, separating installed-runtime
       identity from acquisition provenance.
+<!-- roadmap:runtime-source-states -->
 - [x] Added explicit `verified`, `partial`, and `unresolved` acquisition states so
       missing historical evidence is not silently replaced with newer artifacts.
+<!-- roadmap:runtime-source-ci -->
 - [x] Added offline CI validation of runtime acquisition metadata.
-- [x] Pinned and added offline validation for the exact 143-package OSGeo4W v1
-      acquisition set in `build/osgeo4w-v1-package-lock.json`.
-- [x] Added a checksum-verifying runtime artifact fetcher for components whose
-      acquisition sources are already verified.
-- [x] Added offline tests covering runtime download selection, checksum validation,
-      cache reuse, failed downloads, and safe artifact publication.
-- [x] Added explicit acquisition of the validated OSGeo4W v1 package lock with
-      `--package-set osgeo4w-v1`, including published-size verification.
-
-### Runtime reconstruction
-
-- [ ] Resolve the complete historical OSGeo4W package and dependency set.
+<!-- roadmap:runtime-qgis-source -->
 - [x] Verify the historical OSGeo4W v1 source and checksum for the bundled QGIS package.
+<!-- roadmap:runtime-netlogo-source -->
 - [x] Identify and enable fetching of the official NetLogo 6.2.2 Windows 64-bit MSI.
       FHAST retains a customized subset, not a pristine extraction.
+<!-- roadmap:runtime-jdk-source -->
 - [ ] Tie the recorded Oracle JDK download conclusively to the exact bundled JDK
       build.
+<!-- roadmap:runtime-netlogo-jre-source -->
 - [x] Establish bundled JRE provenance through the same verified NetLogo MSI.
+<!-- roadmap:runtime-pandoc-version -->
 - [ ] Identify the exact bundled Pandoc version.
+
+### Runtime acquisition and reconstruction
+
+<!-- roadmap:osgeo4w-acquisition-lock -->
+- [x] Pinned and added offline validation for the exact 143-package OSGeo4W v1
+      acquisition set in `build/osgeo4w-v1-package-lock.json`.
+<!-- roadmap:runtime-fetcher -->
+- [x] Added a checksum-verifying runtime artifact fetcher for components whose
+      acquisition sources are already verified.
+<!-- roadmap:runtime-fetcher-tests -->
+- [x] Added offline tests covering runtime download selection, checksum validation,
+      cache reuse, failed downloads, and safe artifact publication.
+<!-- roadmap:osgeo4w-package-fetch -->
+- [x] Added explicit acquisition of the validated OSGeo4W v1 package lock with
+      `--package-set osgeo4w-v1`, including published-size verification.
+<!-- roadmap:osgeo4w-dependency-resolution -->
+- [ ] Resolve the complete historical OSGeo4W package and dependency set.
+<!-- roadmap:runtime-extraction -->
 - [ ] Add deterministic extraction of verified runtime artifacts.
+<!-- roadmap:runtime-layout -->
 - [ ] Assemble the expected runtime directory layout from acquisition inputs.
+<!-- roadmap:runtime-reference-comparison -->
 - [ ] Compare reconstructed runtime contents and behavior with the checked-in
       reference bundle.
+<!-- roadmap:windows-clean-build -->
 - [ ] Build the complete Windows application from clean CI inputs.
 
 ### R environment
 
+<!-- roadmap:r-dependency-inventory -->
 - [ ] Inventory and distinguish direct and transitive R package dependencies.
+<!-- roadmap:r-package-versions -->
 - [ ] Establish reproducible R package versions.
+<!-- roadmap:r-dependency-lock -->
 - [ ] Introduce an appropriate dependency lock mechanism.
+<!-- roadmap:r-library-build -->
 - [ ] Reconstruct the FHAST private R library during the build rather than relying
       indefinitely on the checked-in package library.
+<!-- roadmap:r-reference-validation -->
 - [ ] Validate the reconstructed R environment against the reference application.
 
 ### Testing and releases
 
+<!-- roadmap:model-regression-baselines -->
 - [ ] Establish controlled model baselines for infrastructure regression testing.
+<!-- roadmap:windows-startup-tests -->
 - [ ] Add higher-level Windows application startup tests.
+<!-- roadmap:application-chain-tests -->
 - [ ] Exercise the full QGIS → R → NetLogo chain in automated validation where
       practical.
+<!-- roadmap:simulation-output-comparison -->
 - [ ] Compare controlled simulation outputs before replacing bundled components.
+<!-- roadmap:windows-release-artifacts -->
 - [ ] Produce versioned Windows build artifacts in CI.
+<!-- roadmap:developer-release-workflow -->
 - [ ] Document a clean developer and release workflow.
 
 ### Longer-term goals
 
+<!-- roadmap:vendored-runtime-removal -->
 - [ ] Remove checked-in third-party runtime trees after reproducible replacements
       are demonstrated.
+<!-- roadmap:repository-size -->
 - [ ] Reduce the size of the source repository substantially.
+<!-- roadmap:source-build-separation -->
 - [ ] Separate source, build inputs, and generated distribution artifacts more
       clearly.
+<!-- roadmap:linux-builds -->
 - [ ] Support maintainable Linux builds.
+<!-- roadmap:macos-builds -->
 - [ ] Support maintainable macOS builds.
+<!-- roadmap:distribution-formats -->
 - [ ] Evaluate platform-specific distribution formats after the core application
       can be built reproducibly.
 
