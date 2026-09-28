@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Compiled by wixl in tests. Neither installation nor custom actions run. -->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="12345678-1234-1234-1234-123456789001" Name="FHAST fixture"
+           Language="1033" Version="1.0.0" Manufacturer="FHAST"
+           UpgradeCode="12345678-1234-1234-1234-123456789002">
+    <Package Id="12345678-1234-1234-1234-123456789003" InstallerVersion="200"
+             Compressed="yes" InstallScope="perMachine"/>
+    <Media Id="1" Cabinet="fixture.cab" EmbedCab="yes"/>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="PAYLOADDIR" Name="Folder With Spaces">
+        <Component Id="Payload" Guid="12345678-1234-1234-1234-123456789004">
+          <File Id="InternalFileId" Name="Logical Name.txt" Source="payload.txt" KeyPath="yes"/>
+        </Component>
+      </Directory>
+    </Directory>
+    <Feature Id="Main" Level="1"><ComponentRef Id="Payload"/></Feature>
+  </Product>
+</Wix>
