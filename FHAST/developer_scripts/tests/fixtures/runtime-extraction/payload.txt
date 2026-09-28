@@ -1,0 +1,1 @@
+Synthetic FHAST extraction fixture. Never a runtime or installer action.

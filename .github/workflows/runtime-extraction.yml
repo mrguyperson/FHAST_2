@@ -1,0 +1,54 @@
+name: Offline runtime extraction
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-extraction:
+    runs-on: ubuntu-24.04
+    env:
+      FHAST_REQUIRE_EXTRACTION_TOOLS: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /build/windows-runtime-manifest.json
+            /build/windows-runtime-sources.json
+            /build/osgeo4w-v1-package-lock.json
+            /etc/setup/installed.db
+            /FHAST/developer_scripts/fetch_runtime_artifacts.py
+            /FHAST/developer_scripts/check_runtime_sources.py
+            /FHAST/developer_scripts/check_osgeo4w_package_lock.py
+            /FHAST/developer_scripts/extract_runtime_artifacts.py
+            /FHAST/developer_scripts/test_extract_runtime_artifacts.py
+            /FHAST/developer_scripts/tests/fixtures/runtime-extraction/
+      - name: Provision Ubuntu extraction and fixture tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            7zip=23.01+dfsg-11 \
+            msitools=0.103+repack-1build3 \
+            libmsi-1.0-0=0.103+repack-1build3 \
+            libgcab-1.0-0=1.6-1build2 \
+            wixl=0.103+repack-1build3 \
+            wixl-data=0.103+repack-1build3 \
+            nsis=3.09-4ubuntu1 \
+            nsis-common=3.09-4ubuntu1
+          dpkg-query -W 7zip msitools libmsi-1.0-0 libgcab-1.0-0 wixl wixl-data nsis nsis-common
+          7z i | sed -n '1,4p'
+          msiextract --version
+          msiinfo --version
+          wixl --version
+          makensis -VERSION
+      - name: Test synthetic extraction with networking disabled
+        run: |
+          sudo unshare --net env FHAST_REQUIRE_EXTRACTION_TOOLS=1 \
+            python3 FHAST/developer_scripts/test_extract_runtime_artifacts.py

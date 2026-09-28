@@ -186,6 +186,27 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- Extract already fetched local artifacts with
+  `python3 FHAST/developer_scripts/extract_runtime_artifacts.py --input-dir <artifact-cache> --output-dir <extraction-root>`.
+  Both directories must be outside the repository. Optional `--component <name>`
+  or `--package-set osgeo4w-v1` use the fetcher's validated selection; default
+  selection remains the verified standalone components. Extraction is offline,
+  rechecks cached input identities and publishes isolated component/package
+  payloads with deterministic receipts. `--dry-run` verifies local inputs without
+  tools or writes. Existing outputs/locks fail rather than merge or overwrite.
+  QGIS/Python/Qt aliases use the same package destinations as the lock.
+  This is extraction, not FHAST layout assembly, customization or dependency
+  resolution. Postinstall/preremove scripts remain data and are never executed.
+  Run `python3 FHAST/developer_scripts/test_extract_runtime_artifacts.py`.
+  Tar tests use the standard library; external integrations compile tiny source
+  fixtures with makensis/wixl and extract with 7z, msiextract and msiinfo.
+  Missing tools may skip only those integrations locally; set
+  `FHAST_REQUIRE_EXTRACTION_TOOLS=1` to require them.
+  [Extraction CI](.github/workflows/runtime-extraction.yml) provisions pinned
+  Ubuntu tools explicitly, then runs synthetic tests with networking disabled,
+  sparse inputs and no LFS/runtime downloads. Full verified-artifact corpus
+  acceptance is a separate manual step; keep the extraction roadmap task
+  unchecked until review, CI and that explicitly authorized acceptance succeed.
 - Run `python3 FHAST/developer_scripts/check_osgeo4w_package_lock.py` after changes
   to the [package lock](build/osgeo4w-v1-package-lock.json), installed inventory, or
   individually verified QGIS/Python/Qt sources. Run
