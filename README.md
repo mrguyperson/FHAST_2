@@ -267,7 +267,7 @@ completion, and completed work stays in its topical category.
 <!-- roadmap:osgeo4w-dependency-resolution -->
 - [ ] Resolve the complete historical OSGeo4W package and dependency set.
 <!-- roadmap:runtime-extraction -->
-- [ ] Add deterministic extraction of verified runtime artifacts.
+- [x] Add deterministic extraction of verified runtime artifacts.
 <!-- roadmap:runtime-layout -->
 - [ ] Assemble the expected runtime directory layout from acquisition inputs.
 <!-- roadmap:runtime-reference-comparison -->
