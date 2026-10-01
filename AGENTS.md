@@ -16,6 +16,7 @@ All paths below are relative to the repository root.
 | `FHAST/scripts/NetLogo/` | [FHAST.nlogo](FHAST/scripts/NetLogo/FHAST.nlogo), included `.nls` model procedures, and [NetLogo_Controller.R](FHAST/scripts/NetLogo/NetLogo_Controller.R). |
 | `FHAST/default_input/` | Bundled input configuration ([input_file.txt](FHAST/default_input/input_file.txt)). |
 | `FHAST/developer_scripts/` | Developer batch-run and analysis scripts; inspect local assumptions before use. |
+| `FHAST/developer_scripts/assemble_runtime_layout.py` | Offline assembly of verified extraction outputs into a runtime-only staging tree; the required FHAST JDK remains unsupported. |
 | `FHAST/FHAST.Rproj` | R project within the FHAST application directory. |
 | `FHAST/launcher_paths.R` | Shared base-R bootstrap paths used by the four R launch wrappers, relative to their FHAST working directory. |
 | `build/windows-runtime-manifest.json` | Versioned inventory of the current Windows runtime locations, versions, and evidence sources; not a launcher configuration. |
@@ -186,6 +187,57 @@ installed versions rather than treating generic README examples as authoritative
 
 ## Validation
 
+- Assemble the supported extraction profile with
+  `python3 FHAST/developer_scripts/assemble_runtime_layout.py --input-dir <extraction-root> --output-dir <layout-root>`.
+  [The assembler](FHAST/developer_scripts/assemble_runtime_layout.py) requires exactly
+  146 schema-1 extraction receipts: the 143 locked OSGeo4W packages, R Portable,
+  NetLogo and Pandoc. Both roots must be outside the repository and must not overlap;
+  the output must not exist and its parent must already exist. Links (including
+  hardlinks/reparse points), special nodes, unsafe paths and unexpected inputs fail.
+  Complete receipt, payload-count and destination-namespace validation precedes
+  writes. `--dry-run` performs that validation, including file hashing and collision
+  decisions, without output, locks, temporary copies, tools or network access.
+  Schema-1 receipts record artifact identities and aggregate counts, not payload
+  digests: they cannot authenticate unchanged extracted bytes. Supply trusted,
+  stable extraction inputs; no external acceptance seal is required. Files copied
+  into staging are checked against their preflight hashes before publication.
+
+  OSGeo4W payloads overlay the staging root in package-lock order. Shared directories
+  merge; identical files deduplicate. Only the eight exact differing paths/provider
+  sets in the assembler's reviewed policy permit later-provider wins. Unknown
+  differing overlaps, changed provider sets, file/directory conflicts and unknown
+  case aliases fail. The only directory-case canonicalizations are
+  `apps/Python37/lib` to `apps/Python37/Lib` and `apps/qt5` to `apps/Qt5`.
+  Acquisition-supplied root files, `cmake/`, templates and lifecycle scripts remain
+  payload data; no scripts are executed and no configured launchers are generated.
+
+  The entire R payload relocates to `FHAST/FHAST_App/dist/R-Portable/`, without
+  inventing `Data/` state. NetLogo's single `PFiles/NetLogo 6.2.2/` wrapper relocates
+  to `FHAST/FHAST_App/dist/NetLogo 6.2.2/`, retaining its JRE, documentation, models
+  and video extension. Pandoc's `Pandoc/` wrapper relocates its four unchanged files
+  to `FHAST/FHAST_App/dist/Pandoc/`. Project source, QGIS profile, private R library,
+  saved settings, setup inventory and reference customizations are not copied.
+  `fhast-jdk` is explicitly unsupported in status/receipt metadata; its absence does
+  not prevent supported-input assembly, but the output is not a complete runnable
+  FHAST runtime. Keep the broad `runtime-layout` roadmap item unchecked.
+
+  Output bytes are preserved; file/directory modes are set to 0644/0755 and mtimes
+  to 946684800. A private sibling staging directory is published with an atomic
+  no-replace rename: Linux requires libc/filesystem `renameat2(RENAME_NOREPLACE)`
+  support; Windows uses its no-overwrite `os.rename`. Unsupported publication fails
+  without an overwrite fallback. No locks are needed; handled failures clean up
+  private staging. Keep parent directories stable during assembly. The deterministic
+  `layout-receipt.json` records the input profile, ordered inputs and receipt hashes,
+  mappings, collision decisions, JDK limitation, counts and assembled-tree SHA-256.
+  The digest covers sorted compact UTF-8 JSON records `[path,"directory",0]` or
+  `[path,"file",size,sha256]`, each terminated by LF, including empty directories.
+  Payload counts/digest exclude the receipt itself and the output root directory.
+  Run `python3 FHAST/developer_scripts/test_runtime_layout.py`.
+  [Layout CI](.github/workflows/runtime-layout.yml) uses Python's standard library,
+  sparse metadata/tooling checkout, no LFS/runtime downloads or extraction-tool
+  installation, and synthetic tests with networking disabled on Ubuntu.
+  Full-corpus layout acceptance is a separate manual validation; synthetic tests
+  establish neither reference equivalence nor the Windows application chain.
 - Extract already fetched local artifacts with
   `python3 FHAST/developer_scripts/extract_runtime_artifacts.py --input-dir <artifact-cache> --output-dir <extraction-root>`.
   Both directories must be outside the repository. Optional `--component <name>`
