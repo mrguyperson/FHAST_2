@@ -270,6 +270,11 @@ completion, and completed work stays in its topical category.
 - [x] Add deterministic extraction of verified runtime artifacts.
 <!-- roadmap:runtime-layout -->
 - [ ] Assemble the expected runtime directory layout from acquisition inputs.
+      The [verified-input assembler](FHAST/developer_scripts/assemble_runtime_layout.py)
+      handles the 143 locked OSGeo4W payloads plus R Portable, NetLogo and Pandoc.
+      The verified-input layout has passed full-corpus acceptance; the required FHAST
+      JDK still has no verified extraction input. The resulting staging tree is not a
+      complete runnable FHAST runtime, so this broader item remains incomplete.
 <!-- roadmap:runtime-reference-comparison -->
 - [ ] Compare reconstructed runtime contents and behavior with the checked-in
       reference bundle.
